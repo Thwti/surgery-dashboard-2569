@@ -1,0 +1,574 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ยอดผ่าตัด ปีงบประมาณ 2569</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-column clinical report. KPI strip, then monthly stacked chart, department table, heatmap, operation explorer. */
+:root{
+  --bg:#f1f5f6; --surface:#ffffff; --ink:#13242b; --muted:#566972; --line:#d7e1e5; --accent:#0e7078; --accent-ink:#ffffff;
+  --c-sur:#0e7078; --c-ort:#4a58c9; --c-ob:#b23e7c; --c-eye:#c48a0a; --c-ent:#2a8cc4; --c-ped:#5a9a3a; --c-max:#7a8790;
+  --good:#2f7d4f; --warn:#b4690e;
+  --w1:#4f9ea1; --w2:#d9aa3a; --w3:#d9782d; --w4:#b3342f;
+  --font:'IBM Plex Sans Thai','Noto Sans Thai',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1a1f; --surface:#13252c; --ink:#e4eef1; --muted:#90a6af; --line:#26414b; --accent:#4fbcc3; --accent-ink:#06191c;
+  --c-sur:#4fbcc3; --c-ort:#8d99f2; --c-ob:#e47fb0; --c-eye:#e2b13f; --c-ent:#62b6ea; --c-ped:#8fcb6b; --c-max:#a3b0b8;
+  --good:#6cc48f; --warn:#e0a050; --w1:#6cc6c9; --w2:#e8c565; --w3:#ee9550; --w4:#ea6a62; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1a1f; --surface:#13252c; --ink:#e4eef1; --muted:#90a6af; --line:#26414b; --accent:#4fbcc3; --accent-ink:#06191c;
+  --c-sur:#4fbcc3; --c-ort:#8d99f2; --c-ob:#e47fb0; --c-eye:#e2b13f; --c-ent:#62b6ea; --c-ped:#8fcb6b; --c-max:#a3b0b8;
+  --good:#6cc48f; --warn:#e0a050; --w1:#6cc6c9; --w2:#e8c565; --w3:#ee9550; --w4:#ea6a62; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.55;padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:4px;padding-bottom:4px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+h1{margin:0;font-size:clamp(22px,4.4vw,32px);line-height:1.2;font-weight:700;text-wrap:balance}
+.sub{color:var(--muted);margin:0}
+h2{margin:0;font-size:17px;font-weight:600;text-wrap:balance}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel-head{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:space-between;align-items:baseline}
+.note{color:var(--muted);font-size:12.5px;margin:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-size:30px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12.5px;color:var(--muted)}
+.kpi.main{background:var(--accent);border-color:var(--accent)}
+.kpi.main .l,.kpi.main .s,.kpi.main .v{color:var(--accent-ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+svg text{font-family:var(--font);fill:var(--muted);font-size:11px}
+svg .val{fill:var(--ink);font-weight:600;font-family:var(--mono)}
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block;width:100%;min-width:560px;height:auto}
+.bar{cursor:pointer}
+.detail{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px;min-height:44px}
+.detail b{font-size:15px}
+.detail .chip{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px}
+th{font-weight:600;color:var(--muted);font-size:12px;position:sticky;top:0;background:var(--surface)}
+th:first-child,td:first-child{text-align:left}
+tfoot td{font-weight:700;border-top:2px solid var(--line);border-bottom:none}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;max-height:560px;overflow-y:auto}
+.tw table td:first-child,.tw table th:first-child{position:sticky;left:0;background:var(--surface);z-index:1;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.tot{font-weight:600;background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.zero{color:var(--muted);opacity:.45}
+.deptrow{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:8px 14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.deptrow:last-child{border-bottom:none}
+.dn{display:flex;align-items:center;gap:8px;font-weight:500;min-width:0}
+.dbar{display:flex;align-items:center;gap:10px;min-width:0}
+.track{flex:1;height:10px;background:color-mix(in srgb,var(--muted) 16%,transparent);border-radius:5px;overflow:hidden;min-width:60px}
+.track i{display:block;height:100%;border-radius:5px}
+.dnum{font-variant-numeric:tabular-nums;font-weight:600;min-width:150px;text-align:right;white-space:nowrap}
+.dnum small{font-weight:400;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:999px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tab:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+input[type=search]{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0;width:100%;max-width:260px}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.prop{display:flex;height:22px;border-radius:6px;overflow:hidden;gap:2px}
+.prop i{display:block;height:100%}
+.prop-l{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;font-variant-numeric:tabular-nums}
+.topop{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 52px;gap:6px 10px;align-items:center;font-size:13px}
+.topop .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topop .nm em{font-style:normal;color:var(--muted);font-size:12px}
+.topop .tk{height:8px;background:color-mix(in srgb,var(--muted) 16%,transparent);border-radius:4px;overflow:hidden}
+.topop .tk i{display:block;height:100%;border-radius:4px}
+.topop .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+ul.notes{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+@media (max-width:560px){.deptrow{grid-template-columns:1fr}.dnum{text-align:left}}
+@media (prefers-reduced-motion:no-preference){.track i,.topop .tk i{transition:width .4s}}
+.view[hidden]{display:none!important}.view{display:flex;flex-direction:column;gap:18px;min-width:0}.vhead{display:flex;flex-direction:column;gap:4px}.nav{display:flex;flex-wrap:wrap;gap:8px}.nav .tab{font-size:14px;padding:7px 16px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">ปีงบประมาณ 2569 · ต.ค. 2568 – ก.ย. 2569</div>
+  <h1>ยอดผ่าตัดประจำปีงบประมาณ 2569</h1>
+  <p class="sub">รวมทุกแผนก แยกตามรายเดือนและตามหัตถการ จากชีต “สรุปยอดรวมแต่ละแผนกปีงบประมาณ 2569”</p>
+</header>
+<nav id="nav" class="nav" aria-label="มุมมอง"><button type="button" class="tab" data-v="ops" aria-pressed="true">ภาพรวมการผ่าตัด</button><button type="button" class="tab" data-v="risk" aria-pressed="false">ความเสี่ยง</button></nav>
+<div class="view" id="view-ops">
+<section class="kpis" id="kpis" aria-label="ตัวเลขสำคัญ"></section>
+
+<section class="panel" aria-labelledby="h-month">
+  <div class="panel-head"><h2 id="h-month">ยอดผ่าตัดรายเดือน แยกตามแผนก</h2><p class="note">แตะหรือวางเมาส์บนแท่งเพื่อดูรายละเอียดของเดือน</p></div>
+  <div class="legend" id="legend"></div>
+  <div class="chartbox"><svg id="chart" role="img" aria-label="กราฟแท่งซ้อนแสดงยอดผ่าตัดรายเดือนแยกตามแผนก"></svg></div>
+  <div class="detail" id="detail" aria-live="polite"></div>
+</section>
+
+<section class="panel" aria-labelledby="h-dept">
+  <div class="panel-head"><h2 id="h-dept">สรุปยอดรายแผนก</h2><p class="note">สัดส่วนเทียบกับยอดผ่าตัดทั้งหมด</p></div>
+  <div id="depts"></div>
+</section>
+
+<section class="panel" aria-labelledby="h-heat">
+  <div class="panel-head"><h2 id="h-heat">แผนก × เดือน</h2><p class="note">สีเข้มคือเดือนที่ผ่าตัดมากเมื่อเทียบกับแผนกเดียวกัน</p></div>
+  <div class="tw" style="max-height:none"><table id="heat"></table></div>
+</section>
+
+<section class="panel" aria-labelledby="h-ops">
+  <div class="panel-head"><h2 id="h-ops">ยอดแต่ละ operation รายเดือน</h2><p class="note" id="opsnote"></p></div>
+  <div class="tools">
+    <div class="tabs" id="tabs" role="group" aria-label="เลือกแผนก"></div>
+    <input type="search" id="q" placeholder="ค้นหาชื่อ operation" aria-label="ค้นหาชื่อ operation">
+  </div>
+  <div class="tw"><table id="ops"></table></div>
+</section>
+
+<div class="split">
+  <section class="panel" aria-labelledby="h-top">
+    <h2 id="h-top">12 หัตถการที่ทำมากที่สุด</h2>
+    <div class="topop" id="top"></div>
+  </section>
+  <section class="panel" aria-labelledby="h-type">
+    <h2 id="h-type">สัดส่วนตามชีตสรุปยอดรวม</h2>
+    <div id="types" style="display:flex;flex-direction:column;gap:14px"></div>
+    <p class="note">ตัวเลขสองชุดนี้อ่านจากชีตสรุป แต่ละชุดรวมได้ 3,824 ราย เท่ากับยอดรวมทุกแผนก</p>
+  </section>
+</div>
+
+
+</div>
+<div class="view" id="view-risk" hidden>
+  <header class="vhead">
+    <div class="eyebrow">ตัวชี้วัดความเสี่ยง · ปีงบประมาณ 2569</div>
+    <h1 style="font-size:clamp(20px,3.6vw,26px)">ความเสี่ยงจากการผ่าตัด</h1>
+    <p class="sub">ผ่าตัดนอกเวลา ประเภทแผลผ่าตัด (Clean ถึง Dirty) การผ่าตัดซ้ำ และกระดูกหัก เป็นยอดรวมรายเดือน ไม่มีชื่อหรือข้อมูลระบุตัวผู้ป่วย</p>
+  </header>
+
+  <section class="kpis" id="rkpis" aria-label="ตัวเลขความเสี่ยงสำคัญ"></section>
+
+  <section class="panel" aria-labelledby="h-ah">
+    <div class="panel-head"><h2 id="h-ah">ผ่าตัดนอกเวลาราชการ</h2><p class="note">ตัวเลขบนแท่งคือสัดส่วนนอกเวลาของเดือนนั้น</p></div>
+    <div class="legend" id="lg-ah"></div>
+    <div class="chartbox"><svg id="ch-ah" role="img" aria-label="กราฟแท่งซ้อนแสดงการผ่าตัดในเวลาและนอกเวลารายเดือน"></svg></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-wc">
+    <div class="panel-head"><h2 id="h-wc">ประเภทแผลผ่าตัด</h2><p class="note">ประเภทที่ 1 Clean · 2 Clean contaminated · 3 Contaminated · 4 Dirty</p></div>
+    <div class="legend" id="lg-wc"></div>
+    <div class="chartbox"><svg id="ch-wc" role="img" aria-label="กราฟแท่งซ้อนแสดงจำนวนผ่าตัดแยกตามประเภทแผลรายเดือน"></svg></div>
+    <div class="tw" style="max-height:none"><table id="wc-tab"></table></div>
+  </section>
+
+  <div class="split">
+    <section class="panel" aria-labelledby="h-rp">
+      <div class="panel-head"><h2 id="h-rp">ผ่าตัดซ้ำ</h2><p class="note">ชีตมีข้อมูลเฉพาะ ก.ค.–ก.ย.</p></div>
+      <div class="tw" style="max-height:none"><table id="rp-tab"></table></div>
+      <p class="note">อัตราผู้ป่วยผ่าตัดซ้ำ = ผู้ป่วยที่มาผ่าตัดซ้ำในเดือน ÷ ผู้ป่วยที่มาผ่าตัดทั้งหมดในเดือน</p>
+    </section>
+    <section class="panel" aria-labelledby="h-er">
+      <div class="panel-head"><h2 id="h-er">รับผู้ป่วยจาก ER</h2><p class="note" id="er-note"></p></div>
+      <div class="chartbox"><svg id="ch-er" style="min-width:0" role="img" aria-label="กราฟแท่งแสดงจำนวนผู้ป่วยที่รับจาก ER รายเดือน"></svg></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="h-fx">
+    <div class="panel-head"><h2 id="h-fx">กระดูกหัก แยกชนิดและความรุนแรง</h2><p class="note" id="fx-note"></p></div>
+    <div class="legend" id="lg-fx"></div>
+    <div class="chartbox"><svg id="ch-fx" role="img" aria-label="กราฟแท่งซ้อนแสดงกระดูกหักปิดและเปิดแต่ละระดับรายเดือน"></svg></div>
+  </section>
+
+  
+</div>
+
+</div>
+
+<script>
+const A=(n,s)=>({n,v:s.split(',').map(Number)});
+const S=(n,o)=>{const v=Array(12).fill(0);for(const k in o)v[k]=o[k];return {n,v}};
+const DEPTS=[
+{id:'sur',name:'ศัลยกรรม',tab:'ศัลยกรรม',exp:[140,145,170,122,131,206,125,136,292,136,321,160],ops:[
+A('Excision','18,18,12,6,4,11,11,21,24,17,12,18'),
+A('CNBx','2,1,0,1,0,0,0,0,1,0,0,3'),
+A('Excision breast mass','1,1,0,1,1,2,0,0,1,0,0,0'),
+A('Appendectomy','10,17,20,11,22,20,12,18,20,17,28,20'),
+S('Lap Appendectomy',{9:1}),
+A('I&D','4,0,0,1,2,2,0,3,2,2,2,0'),
+A('O&D','0,4,3,6,6,1,5,2,2,5,2,3'),
+A('Nail extraction','0,0,0,0,0,1,0,0,0,0,0,1'),
+A('Suture wound','3,1,4,1,1,0,2,4,6,4,2,2'),
+A('Debridement','13,12,16,8,5,13,11,11,7,5,13,6'),
+A('Repair umbilicalhernia','0,0,1,0,0,1,0,0,0,0,1,0'),
+A('Hernioplasty','8,18,8,5,7,8,8,6,12,11,10,14'),
+S('Herniotomy',{10:1}),
+A('Circumcision','1,1,0,0,2,1,1,0,5,2,1,2'),
+S('Derssing wound',{11:1}),
+A('EGD','22,31,36,19,20,14,22,23,16,20,22,29'),
+S('EGD c polypectomy',{11:1}),
+A('Colonoscopy','22,14,19,18,19,60,12,16,121,17,145,20'),
+A('Colonoscopy c polypectomy','5,2,2,7,4,25,1,1,27,1,35,3'),
+A('EGD+Colonoscopy c polypectomy','0,0,0,0,0,0,3,0,0,0,1,1'),
+A('EGD+Colonoscopy','3,2,3,0,2,1,5,2,3,0,4,3'),
+A('Excision hemorrhoid','2,0,2,2,2,0,0,1,1,0,3,3'),
+A('Hemorrhoidectomy','2,1,1,1,2,3,0,2,2,1,3,2'),
+A('Open Cholecystectomy','0,0,0,2,0,0,0,0,0,1,3,0'),
+S('Partial Cholecystectomy',{2:1}),
+A('Remove foreign body','0,0,0,1,1,1,1,0,0,0,0,0'),
+A('Exploratory Laparotomy','0,0,0,3,2,1,1,3,4,3,3,1'),
+A('Exploratory sigmoidectomy','1,1,1,0,0,1,1,0,3,2,1,1'),
+A('Exploratory Gastojejunostomy','0,0,0,0,0,0,0,1,0,0,0,2'),
+A('Exploratory Laparotomy c lysis adhesion','1,1,2,0,0,3,0,0,1,2,0,0'),
+S('Total gastectomy',{3:1}),
+S('Suture Duodenal ulcer perforate',{1:1,4:2}),
+A('Fasciotomy','1,0,0,0,0,1,0,0,0,2,0,0'),
+A('Fistulectomy','0,0,1,0,0,1,0,1,1,0,0,0'),
+A('EL c Hemicolectomy','0,1,0,1,3,4,2,1,5,1,1,2'),
+A('Colostomy','1,3,4,2,1,1,2,1,0,0,3,2'),
+A('Below knee Amputation','1,1,1,0,1,1,1,0,3,1,0,0'),
+S('Above knee Amputation',{5:1,6:1}),
+A('Amputation','3,3,8,3,5,7,0,0,1,5,8,2'),
+S('Intraperitoneal drainage',{9:1}),
+S('Incisional Biopsy',{0:1}),
+S('Excisional biopsy',{3:1,11:1}),
+S('Biopsy',{5:2}),
+A('Repair Hernia','1,0,0,0,0,1,1,0,0,1,0,0'),
+S('Repair bladder',{3:1,8:1}),
+S('Orchidectomy',{2:1,3:2,6:1}),
+A('LC','9,7,6,6,5,9,8,8,8,4,3,8'),
+S('Tracheostomy',{10:2,11:1}),
+S('Aspiration abscess',{1:1}),
+A('Modified Radical Mastectomy','1,0,0,1,0,1,1,2,1,0,0,0'),
+A('EL c Small bowel resection','0,0,3,0,0,0,1,2,2,1,1,0'),
+S('EL c Total colectomy',{9:1}),
+S('EL c Subtotal colectomy',{2:1}),
+S('Suture colon',{3:1,8:1}),
+A('EL c Simple closure Gastic ulcer','0,0,2,0,0,0,0,1,0,2,1,0'),
+S('EL C Low Anterior resection',{4:1,6:4}),
+S('Simple closure duodenum',{10:1}),
+A('EL c Gastrostomy','1,0,3,0,0,1,1,0,0,1,0,0'),
+A('Chang FJ','0,0,0,4,2,0,0,0,1,0,0,0'),
+A('Lysis toung tie','0,2,6,3,2,3,2,1,3,3,3,6'),
+S('Venous stripping',{8:1}),
+S('Vacuum Dressing',{6:1}),
+S('Exploration wound',{8:2}),
+S('Stop bleeding by cauterization',{5:1,9:1}),
+S('Core needdle biopsy',{3:1}),
+S('Repair artery',{1:1}),
+S('Altemier Procedure',{8:1}),
+A('Remove FB','0,0,0,1,0,0,0,1,0,1,0,1'),
+A('Lap TEP','1,0,1,0,1,1,0,2,1,0,1,1'),
+A('Fistulotomy','1,0,0,1,3,1,0,1,0,0,0,0'),
+S('EGD c incisional biopsy',{0:1}),
+A('EL with Feedingjejunostomy','0,0,2,0,1,0,3,1,1,0,1,0'),
+S('Retain Foley catheter',{4:1}),
+S('Laparoscopic Dx.',{5:1}),
+S('Laparoscopic Colectomy',{4:1,8:1,10:1}),
+S('EL c Hernioplasty',{10:2}),
+S('Breast augmentation',{10:1})
+]},
+{id:'ort',name:'ศัลยกรรมกระดูกและข้อ',tab:'ศัลยกรรมกระดูกและข้อ',exp:[73,75,75,82,113,93,87,83,78,82,95,72],ops:[
+A('Debridement','5,10,13,10,17,16,16,8,5,4,11,4'),
+A('DB open Fx.','4,1,5,1,2,0,0,0,1,0,2,0'),
+A('DB with PAS','0,0,0,0,1,2,2,2,0,3,1,1'),
+A('DB with K-wire','3,5,3,4,3,1,2,1,4,5,4,5'),
+A('DB with repair tendon','2,3,1,7,4,11,6,11,4,5,11,7'),
+A('CRIF with PAS','0,2,0,0,0,0,2,1,0,0,0,2'),
+A('CRIF with K-wire','2,3,1,1,2,3,1,0,3,5,6,1'),
+S('CRIF with Screw',{9:1}),
+A('CRIF with TBW','0,1,2,0,0,1,1,1,0,0,1,0'),
+A('CRIF with IM nailing','1,0,2,0,2,1,2,0,0,0,1,2'),
+S('CRIF with multiple screw',{0:1}),
+S('CRIF with Hook plate',{3:1}),
+A('CRIF with Proximal femoral nailing','5,1,2,1,2,2,0,3,2,4,1,2'),
+S('ORIF with .....',{1:1,8:1}),
+A('ORIF with PAS','19,15,12,15,27,12,17,14,15,15,13,18'),
+A('ORIF with K-wire','1,4,0,2,1,0,2,2,0,1,1,1'),
+A('ORIF with Screw','4,0,0,0,1,1,3,1,1,0,0,0'),
+S('ORIF with multiple screw',{4:1}),
+A('ORIF with Proximal femoral nailing','0,1,2,1,0,1,2,0,0,0,0,0'),
+S('ORIF with IM nailing',{11:1}),
+S('CREF',{11:1}),
+A('External fixation spanning','1,1,0,0,0,0,0,0,2,0,1,0'),
+A('Removal of internal fixation device','5,3,5,3,6,9,9,8,7,3,4,2'),
+S('Removal of external fixation device',{4:1,6:1}),
+A('Repair tendon','1,1,4,2,5,2,1,0,2,3,1,3'),
+A('Release carpal tunnel','2,3,2,2,3,4,4,4,4,6,4,3'),
+S('Release dequervain',{0:1,4:1,7:1,8:1}),
+S('Release cubital tunnel',{0:1,8:1}),
+A('Trigger finger','1,2,1,0,0,2,3,2,5,3,0,0'),
+S('Repair nail bed',{4:1,5:1,7:2}),
+S('Biopsy',{7:1}),
+A('Excision','2,3,0,0,3,4,1,0,2,1,5,2'),
+A('Tenolysis','0,1,2,1,2,1,0,0,1,1,2,0'),
+S('I&D',{7:1,9:1,11:1}),
+S('O&D',{5:2}),
+A('BKA','1,1,1,1,0,0,0,1,0,0,0,0'),
+S("Ray's Amputation",{5:1}),
+A('Amputation toe','1,0,1,5,3,1,0,2,0,0,1,1'),
+S('Amputation finger',{4:1,9:1,10:1}),
+A('Close reduction','2,3,0,1,2,0,0,0,1,5,0,0'),
+S('Open reduction',{0:1,3:1}),
+S('Suture wound',{2:1,3:1,7:1,8:1}),
+A('Arthrotomy','1,1,2,4,2,0,1,2,1,0,1,1'),
+S('Remove foreign body',{1:1,2:2,3:1,7:1,10:2}),
+S('STSG',{4:1}),
+S('V-Y flab',{10:1}),
+A('Vacuum dressing','0,0,2,3,1,5,0,0,0,0,0,0'),
+S('Vacuum dressing wound',{4:1}),
+S('Resuture',{2:1}),
+S('Excisional Biopsy',{10:1}),
+S('Fasciotomy',{4:1,9:1}),
+A('Total hip arthoplasty','2,0,3,0,0,3,3,0,1,4,3,1'),
+S('Cementless total Hip arthoplasty',{0:1}),
+A('Bipolar Hemiarthoplasty','0,0,1,5,1,2,1,3,0,3,2,1'),
+S('Cementless bipolar Hemiarthoplasty Hip',{11:1}),
+S('Revise total hip arthroplasty',{10:1}),
+S('Revision PAS',{4:1}),
+S('Revision TBW',{4:1}),
+A('Total knee arthroplasty','2,7,4,9,12,5,7,10,13,7,13,11'),
+S('Soft tissue release',{4:1}),
+S('Revision internal fixation',{0:1,1:1})
+]},
+{id:'ob',name:'สูติ-นรีเวชกรรม',tab:'สูติกรรม',exp:[56,46,48,42,30,26,39,20,36,37,34,40],ops:[
+A('LTc/s','31,30,29,29,18,15,20,10,19,17,18,28'),
+A('PPTR','12,7,6,2,1,4,7,1,5,11,10,7'),
+A('D&C','1,1,1,3,2,1,1,2,1,1,1,2'),
+A('F&C','5,4,1,4,4,1,6,1,8,2,1,0'),
+A('TAH','1,1,1,1,0,3,0,0,0,0,1,0'),
+S('Cystectomy',{8:1}),
+S('Salphingo-oophorectomy',{2:1,4:1,11:1}),
+S('Myomectomy',{8:1}),
+S('SPTR',{0:1,3:2,11:1}),
+S('Explor lap',{4:1,5:1}),
+S('TVH c A-P Repair',{0:1}),
+S('I&D',{6:1}),
+S('Salphingectomy',{1:1,2:2,3:1,7:2}),
+S('Remove implant',{10:1}),
+S('Remove FB',{5:1,7:1}),
+A('LEEP','1,0,3,0,2,0,3,2,1,5,2,1'),
+S('Excision',{4:1}),
+S('Suture wound',{2:1}),
+S('Evacuate hematoma',{1:1,6:1}),
+S('Repair of ovary',{7:1}),
+S('Polypectomy',{2:1,9:1}),
+S('Debridement',{0:2,1:1,2:2}),
+S('D&C with PPTR',{0:1})
+]},
+{id:'eye',name:'จักษุ (EYE)',tab:'EYE',exp:[15,11,38,27,34,15,25,7,0,9,16,21],ops:[
+A('Phaco c IOL','13,11,36,26,31,9,22,6,0,7,14,19'),
+S('PEX',{5:1,9:1}),
+A('PEX c Conjungtival graft','0,0,2,1,2,5,2,1,0,0,1,1'),
+S('Excision',{4:1}),
+S('I+C',{0:1,6:1,9:1}),
+S('Blepharoplasty',{10:1,11:1}),
+S('Ptosis correction',{0:1})
+]},
+{id:'ent',name:'หู คอ จมูก (ENT)',tab:'ENT/กุมารฯ',exp:[0,0,8,10,13,10,2,2,0,0,0,0],ops:[
+A('Excision','0,0,3,5,6,5,2,1,0,0,0,0'),
+S('I&D',{2:1}),
+S('Tonsillectomy',{3:1,4:2,5:1}),
+S('Tonsillectomy c adenoidectomy',{2:1,4:2,5:1}),
+S('Lobectomy',{3:1,5:2}),
+S('Total Thyroidectomy',{4:1}),
+S('Biopsy',{3:1}),
+S('Tracheostomy',{2:1,3:2}),
+S('Lysis tongue tie',{4:2}),
+S('DL c mapping',{2:2,7:1}),
+S('Debridement',{5:1})
+]},
+{id:'ped',name:'กุมารเวชกรรม',tab:'ENT/กุมารฯ',exp:[5,2,3,1,0,0,0,0,0,1,0,0],ops:[
+A('Lysis toung tie','5,2,3,1,0,0,0,0,0,1,0,0')
+]},
+{id:'max',name:'Maxillofacial',tab:'Maxillofacial',exp:[0,0,0,0,0,0,0,0,0,1,1,1],ops:[
+S('I&D',{9:1}),
+S('O&D',{11:1}),
+S('Nasal bone reduction',{10:1})
+]}
+];
+
+const MONTHS=['ต.ค.','พ.ย.','ธ.ค.','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.'];
+const MFULL=['ตุลาคม','พฤศจิกายน','ธันวาคม','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน'];
+const fmt=n=>n.toLocaleString('en-US');
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+DEPTS.forEach(d=>{d.ops.forEach(o=>o.t=sum(o.v));d.ops=d.ops.filter(o=>o.t>0);d.m=Array(12).fill(0);d.ops.forEach(o=>o.v.forEach((x,i)=>d.m[i]+=x));d.t=sum(d.m);});
+const GT=sum(DEPTS.map(d=>d.t));
+const MT=MONTHS.map((_,i)=>sum(DEPTS.map(d=>d.m[i])));
+const col=d=>`var(--c-${d.id})`;
+const peak=MT.indexOf(Math.max(...MT));
+const topDept=[...DEPTS].sort((a,b)=>b.t-a.t)[0];
+const allOps=DEPTS.flatMap(d=>d.ops.map(o=>({...o,d})));
+const topOp=[...allOps].sort((a,b)=>b.t-a.t)[0];
+
+$('kpis').innerHTML=[
+ ['main','ยอดผ่าตัดทั้งปีงบประมาณ',fmt(GT),'ราย จาก '+DEPTS.length+' แผนก'],
+ ['','เฉลี่ยต่อเดือน',fmt(Math.round(GT/12)),'ราย'],
+ ['','เดือนที่ผ่าตัดมากที่สุด',MFULL[peak],fmt(MT[peak])+' ราย'],
+ ['','แผนกที่ผ่าตัดมากที่สุด',topDept.name,fmt(topDept.t)+' ราย · '+(topDept.t/GT*100).toFixed(1)+'%'],
+ ['','หัตถการที่ทำมากที่สุด',topOp.n,fmt(topOp.t)+' ราย · '+topOp.d.name]
+].map(k=>`<div class="kpi ${k[0]}"><span class="l">${k[1]}</span><span class="v" ${k[2].length>12?'style="font-size:20px;line-height:1.4"':''}>${k[2]}</span><span class="s">${k[3]}</span></div>`).join('');
+
+$('legend').innerHTML=DEPTS.map(d=>`<span><i class="sw" style="background:${col(d)}"></i>${d.name}</span>`).join('');
+
+/* stacked chart */
+(function(){
+ const W=720,H=300,L=40,R=8,T=22,B=30;
+ const svg=$('chart');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+ const maxV=Math.ceil(Math.max(...MT)/100)*100;
+ const y=v=>T+(H-T-B)*(1-v/maxV);
+ const bw=(W-L-R)/12;
+ let s='';
+ for(let v=0;v<=maxV;v+=100){s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;}
+ MONTHS.forEach((m,i)=>{
+  const x=L+i*bw+bw*.16,w=bw*.68;let acc=0;
+  s+=`<g class="bar" data-i="${i}" tabindex="0" role="button" aria-label="${MFULL[i]} ${MT[i]} ราย">`;
+  s+=`<rect x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" style="fill:transparent"/>`;
+  DEPTS.forEach(d=>{const v=d.m[i];if(!v)return;const y1=y(acc+v),y0=y(acc);acc+=v;s+=`<rect x="${x}" y="${y1}" width="${w}" height="${Math.max(y0-y1,0)}" style="fill:${col(d)}"><title>${d.name} ${v}</title></rect>`;});
+  s+=`<text class="val" x="${x+w/2}" y="${y(MT[i])-5}" text-anchor="middle">${MT[i]}</text>`;
+  s+=`<text x="${x+w/2}" y="${H-10}" text-anchor="middle">${m}</text></g>`;
+ });
+ svg.innerHTML=s;
+ const sel=i=>{
+  svg.querySelectorAll('.bar').forEach(g=>g.style.opacity=(+g.dataset.i===i)?1:.55);
+  $('detail').innerHTML=`<b>${MFULL[i]} ${i<3?'2568':'2569'} · ${fmt(MT[i])} ราย</b>`+DEPTS.filter(d=>d.m[i]).sort((a,b)=>b.m[i]-a.m[i]).map(d=>`<span class="chip"><i class="sw" style="background:${col(d)}"></i>${d.name} ${fmt(d.m[i])}</span>`).join('');
+ };
+ svg.querySelectorAll('.bar').forEach(g=>{const i=+g.dataset.i;g.addEventListener('mouseenter',()=>sel(i));g.addEventListener('click',()=>sel(i));g.addEventListener('focus',()=>sel(i));});
+ sel(peak);
+})();
+
+/* department rows */
+$('depts').innerHTML=[...DEPTS].sort((a,b)=>b.t-a.t).map(d=>{
+ const pk=d.m.indexOf(Math.max(...d.m));
+ return `<div class="deptrow"><div class="dn"><i class="sw" style="background:${col(d)}"></i><span>${d.name}</span></div>
+ <div class="dbar"><div class="track"><i style="width:${(d.t/GT*100).toFixed(2)}%;background:${col(d)}"></i></div><div class="dnum">${fmt(d.t)} ราย <small>${(d.t/GT*100).toFixed(1)}% · สูงสุด ${MONTHS[pk]} ${d.m[pk]}</small></div></div></div>`;
+}).join('');
+
+/* heat table */
+function shade(v,max){return v>0?`style="background:color-mix(in srgb,var(--accent) ${Math.round(v/max*46)}%,transparent)"`:'';}
+$('heat').innerHTML=`<thead><tr><th>แผนก</th>${MONTHS.map(m=>`<th>${m}</th>`).join('')}<th>รวม</th></tr></thead><tbody>`+
+ DEPTS.map(d=>{const mx=Math.max(...d.m);return `<tr><td><i class="sw" style="background:${col(d)};margin-right:8px"></i>${d.name}</td>${d.m.map(v=>v?`<td ${shade(v,mx)}>${fmt(v)}</td>`:`<td class="zero">–</td>`).join('')}<td class="tot">${fmt(d.t)}</td></tr>`}).join('')+
+ `</tbody><tfoot><tr><td>รวมทุกแผนก</td>${MT.map(v=>`<td>${fmt(v)}</td>`).join('')}<td>${fmt(GT)}</td></tr></tfoot>`;
+
+/* explorer */
+let cur=DEPTS[0].id;
+$('tabs').innerHTML=DEPTS.map(d=>`<button class="tab" type="button" data-id="${d.id}" aria-pressed="${d.id===cur}">${d.name} <span style="opacity:.75">${fmt(d.t)}</span></button>`).join('');
+function renderOps(){
+ const d=DEPTS.find(x=>x.id===cur);const q=$('q').value.trim().toLowerCase();
+ const rows=d.ops.filter(o=>!q||o.n.toLowerCase().includes(q)).sort((a,b)=>b.t-a.t||a.n.localeCompare(b.n));
+ const mx=Math.max(1,...rows.flatMap(o=>o.v));
+ $('opsnote').textContent=`${d.name}: ${d.ops.length} รายการที่มียอด · รวม ${fmt(d.t)} ราย`;
+ $('ops').innerHTML=`<thead><tr><th>Operation</th>${MONTHS.map(m=>`<th>${m}</th>`).join('')}<th>รวม</th></tr></thead><tbody>`+
+  (rows.length?rows.map(o=>`<tr><td title="${o.n}">${o.n}</td>${o.v.map(v=>v?`<td ${shade(v,mx)}>${fmt(v)}</td>`:`<td class="zero">–</td>`).join('')}<td class="tot">${fmt(o.t)}</td></tr>`).join(''):`<tr><td colspan="14" style="text-align:center;color:var(--muted)">ไม่พบรายการที่ค้นหา</td></tr>`)+
+  `</tbody><tfoot><tr><td>รวม${q?' (ที่แสดง)':''}</td>${MONTHS.map((_,i)=>`<td>${fmt(sum(rows.map(o=>o.v[i])))}</td>`).join('')}<td>${fmt(sum(rows.map(o=>o.t)))}</td></tr></tfoot>`;
+}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cur=b.dataset.id;$('tabs').querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed',x===b));renderOps();});
+$('q').addEventListener('input',renderOps);
+renderOps();
+
+/* top ops */
+const topList=[...allOps].sort((a,b)=>b.t-a.t).slice(0,12);
+$("top").innerHTML=topList.map(o=>`<span class="nm" title="${o.n}">${o.n} <em>${o.d.name}</em></span><span class="tk"><i style="width:${(o.t/topList[0].t*100).toFixed(1)}%;background:${col(o.d)}"></i></span><span class="n">${fmt(o.t)}</span>`).join('');
+
+/* summary-sheet splits */
+function prop(title,items){
+ const t=sum(items.map(x=>x[1]));
+ return `<div><div style="font-weight:500;margin-bottom:6px">${title}</div><div class="prop">${items.map((x,i)=>`<i title="${x[0]} ${x[1]}" style="width:${x[1]/t*100}%;background:${x[2]}"></i>`).join('')}</div><div class="prop-l" style="margin-top:6px">${items.map(x=>`<span><i class="sw" style="background:${x[2]};margin-right:5px"></i>${x[0]} ${fmt(x[1])} (${(x[1]/t*100).toFixed(1)}%)</span>`).join('')}</div></div>`;
+}
+$('types').innerHTML=prop('ในเวลา / นอกเวลาราชการ',[['ในเวลา',2305,'var(--c-sur)'],['นอกเวลา',1519,'var(--c-eye)']])+
+ prop('ประเภทแผลผ่าตัด',[['ประเภทที่ 1 Clean',1303,'var(--w1)'],['ประเภทที่ 2 Clean contaminated',1770,'var(--w2)'],['ประเภทที่ 3 Contaminated',602,'var(--w3)'],['ประเภทที่ 4 Dirty',149,'var(--w4)']]);
+/* ===== risk view ===== */
+(function(){
+const N=null;
+const R={
+ inH:[200,188,208,203,209,190,187,158,177,179,202,204],
+ afH:[89,91,134,81,113,160,91,90,229,87,264,90],
+ w1:[106,98,118,99,130,108,113,86,103,108,114,120],
+ w2:[144,128,162,134,142,110,124,112,141,123,307,143],
+ w3:[29,40,37,35,33,113,30,43,158,31,32,21],
+ w4:[10,13,25,16,17,19,11,7,4,4,13,10],
+ er:[11,9,12,19,13,17,11,10,13,20,15,10],
+ closed:[24,17,17,18,31,22,24,19,19,32,19,26],
+ g1:[11,13,5,5,10,2,6,3,3,7,9,6],
+ g2:[0,0,1,0,1,0,0,0,0,0,1,1],
+ g3:[0,0,0,0,0,0,0,2,3,0,0,1],
+ rpOps:[N,N,N,N,N,N,N,N,N,20,26,27],
+ rpPts:[N,N,N,N,N,N,N,N,N,9,12,13],
+ pts:[N,N,N,N,N,N,N,N,N,246,441,267],
+ tot:[289,279,342,284,322,350,278,248,406,266,466,294]
+};
+const pc=(a,b)=>(a/b*100).toFixed(1)+'%';
+const S2=a=>a.reduce((x,y)=>x+(y||0),0);
+const TOT=S2(R.tot);
+const inT=S2(R.inH),afT=S2(R.afH),w3T=S2(R.w3),w4T=S2(R.w4),erT=S2(R.er);
+const clT=S2(R.closed),opT=S2(R.g1)+S2(R.g2)+S2(R.g3),fxT=clT+opT;
+const rpO=S2(R.rpOps),rpP=S2(R.rpPts),ptT=S2(R.pts);
+const sv=id=>document.getElementById(id);
+
+sv('rkpis').innerHTML=[
+ ['main','ผ่าตัดนอกเวลาราชการ',fmt(afT),'ราย · '+pc(afT,TOT)+' ของยอดทั้งปี'],
+ ['','แผล Contaminated + Dirty',fmt(w3T+w4T),'ราย · '+pc(w3T+w4T,TOT)+' (Dirty: '+fmt(w4T)+')'],
+ ['','ผ่าตัดซ้ำ (ก.ค.–ก.ย.)',fmt(rpO),'ครั้ง · '+fmt(rpP)+' ผู้ป่วย'],
+ ['','อัตราผู้ป่วยผ่าตัดซ้ำ',pc(rpP,ptT),fmt(rpP)+' จาก '+fmt(ptT)+' ราย (ก.ค.–ก.ย.)'],
+ ['','กระดูกหักเปิด',fmt(opT),'ราย · '+pc(opT,fxT)+' ของกระดูกหัก '+fmt(fxT)+' ราย'],
+ ['','รับผู้ป่วยจาก ER',fmt(erT),'ราย ตลอดปีงบประมาณ']
+].map(k=>`<div class="kpi ${k[0]}"><span class="l">${k[1]}</span><span class="v">${k[2]}</span><span class="s">${k[3]}</span></div>`).join('');
+
+/* generic stacked bar chart */
+function stack(id,series,o){
+ o=o||{};const W=720,H=o.h||260,L=40,Rr=8,T=24,B=28;
+ const mx=Math.max(...R.tot.map((_,i)=>S2(series.map(s=>s.v[i]))));
+ const step=o.step||100,maxV=Math.ceil(mx/step)*step;
+ const y=v=>T+(H-T-B)*(1-v/maxV),bw=(W-L-Rr)/12;
+ let s='';
+ for(let v=0;v<=maxV;v+=step)s+=`<line x1="${L}" x2="${W-Rr}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+ MONTHS.forEach((m,i)=>{
+  const x=L+i*bw+bw*.16,w=bw*.68;let acc=0;
+  series.forEach(se=>{const v=se.v[i];if(!v)return;const y1=y(acc+v),y0=y(acc);acc+=v;s+=`<rect x="${x}" y="${y1}" width="${w}" height="${Math.max(y0-y1,0)}" style="fill:${se.c}"><title>${MFULL[i]} · ${se.n} ${v}</title></rect>`;});
+  const lab=o.label?o.label(i,acc):acc;
+  s+=`<text class="val" x="${x+w/2}" y="${y(acc)-5}" text-anchor="middle">${lab}</text><text x="${x+w/2}" y="${H-9}" text-anchor="middle">${m}</text>`;
+ });
+ sv(id).setAttribute('viewBox',`0 0 ${W} ${H}`);sv(id).innerHTML=s;
+}
+const leg=(id,ser)=>{sv(id).innerHTML=ser.map(s=>`<span><i class="sw" style="background:${s.c}"></i>${s.n}</span>`).join('');};
+
+/* after-hours */
+const ahS=[{n:'ในเวลา',c:'var(--c-max)',v:R.inH},{n:'นอกเวลา',c:'var(--warn)',v:R.afH}];
+leg('lg-ah',ahS);
+stack('ch-ah',ahS,{label:(i)=>Math.round(R.afH[i]/R.tot[i]*100)+'%'});
+
+/* wound class */
+const wcS=[{n:'ประเภทที่ 1 Clean',c:'var(--w1)',v:R.w1},{n:'ประเภทที่ 2 Clean contaminated',c:'var(--w2)',v:R.w2},{n:'ประเภทที่ 3 Contaminated',c:'var(--w3)',v:R.w3},{n:'ประเภทที่ 4 Dirty',c:'var(--w4)',v:R.w4}];
+leg('lg-wc',wcS);
+stack('ch-wc',wcS);
+const hi=R.w3.map((v,i)=>v+R.w4[i]),hiMax=Math.max(...hi.map((v,i)=>v/R.tot[i]));
+sv('wc-tab').innerHTML=`<thead><tr><th></th>${MONTHS.map(m=>`<th>${m}</th>`).join('')}<th>รวม</th></tr></thead><tbody>`+
+ `<tr><td>Contaminated + Dirty (ราย)</td>${hi.map(v=>`<td>${fmt(v)}</td>`).join('')}<td class="tot">${fmt(S2(hi))}</td></tr>`+
+ `<tr><td>สัดส่วนของเดือน</td>${hi.map((v,i)=>{const r=v/R.tot[i];return `<td style="background:color-mix(in srgb,var(--w3) ${Math.round(r/hiMax*50)}%,transparent)">${(r*100).toFixed(0)}%</td>`}).join('')}<td class="tot">${pc(S2(hi),TOT)}</td></tr></tbody>`;
+
+/* repeat surgery */
+sv('rp-tab').innerHTML=`<thead><tr><th></th><th>ก.ค.</th><th>ส.ค.</th><th>ก.ย.</th><th>รวม</th></tr></thead><tbody>`+
+ `<tr><td>ผ่าตัดซ้ำ (ครั้ง)</td>${[9,10,11].map(i=>`<td>${R.rpOps[i]}</td>`).join('')}<td class="tot">${rpO}</td></tr>`+
+ `<tr><td>ผู้ป่วยผ่าตัดซ้ำ (ราย)</td>${[9,10,11].map(i=>`<td>${R.rpPts[i]}</td>`).join('')}<td class="tot">${rpP}</td></tr>`+
+ `<tr><td>ผู้ป่วยผ่าตัดทั้งหมด (ราย)</td>${[9,10,11].map(i=>`<td>${R.pts[i]}</td>`).join('')}<td class="tot">${ptT}</td></tr>`+
+ `<tr><td>อัตราผู้ป่วยผ่าตัดซ้ำ</td>${[9,10,11].map(i=>`<td>${pc(R.rpPts[i],R.pts[i])}</td>`).join('')}<td class="tot">${pc(rpP,ptT)}</td></tr></tbody>`;
+
+/* ER */
+sv('er-note').textContent='รวม '+fmt(erT)+' ราย · เฉลี่ย '+(erT/12).toFixed(1)+' ราย/เดือน';
+stack('ch-er',[{n:'รับจาก ER',c:'var(--c-ent)',v:R.er}],{step:5,h:220});
+
+/* fractures */
+const fxS=[{n:'กระดูกหักปิด',c:'var(--c-max)',v:R.closed},{n:'เปิด Gr.1',c:'var(--w2)',v:R.g1},{n:'เปิด Gr.2',c:'var(--w3)',v:R.g2},{n:'เปิด Gr.3',c:'var(--w4)',v:R.g3}];
+leg('lg-fx',fxS);
+stack('ch-fx',fxS,{step:10});
+sv('fx-note').textContent='กระดูกหักทั้งหมด '+fmt(fxT)+' ราย · เปิด '+fmt(opT)+' ราย (Gr.2–3 รวม '+fmt(S2(R.g2)+S2(R.g3))+' ราย)';
+
+/* view switch */
+const vs={ops:sv('view-ops'),risk:sv('view-risk')};
+function show(k){vs.ops.hidden=k!=='ops';vs.risk.hidden=k!=='risk';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===k));try{history.replaceState(null,'',k==='risk'?'#risk':location.pathname+location.search);}catch(e){}}
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
+if(location.hash==='#risk')show('risk');
+})();
+</script>
+
+</body></html>
