@@ -1,0 +1,644 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ยอดผ่าตัด ปีงบประมาณ 2569</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-column clinical report. KPI strip, then monthly stacked chart, department table, heatmap, operation explorer. */
+:root{
+  --bg:#f1f5f6; --surface:#ffffff; --ink:#13242b; --muted:#566972; --line:#d7e1e5; --accent:#0e7078; --accent-ink:#ffffff;
+  --c-sur:#0e7078; --c-ort:#4a58c9; --c-ob:#b23e7c; --c-eye:#c48a0a; --c-ent:#2a8cc4; --c-ped:#5a9a3a; --c-max:#7a8790;
+  --good:#2f7d4f; --warn:#b4690e;
+  --w1:#4f9ea1; --w2:#d9aa3a; --w3:#d9782d; --w4:#b3342f;
+  --font:'IBM Plex Sans Thai','Noto Sans Thai',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1a1f; --surface:#13252c; --ink:#e4eef1; --muted:#90a6af; --line:#26414b; --accent:#4fbcc3; --accent-ink:#06191c;
+  --c-sur:#4fbcc3; --c-ort:#8d99f2; --c-ob:#e47fb0; --c-eye:#e2b13f; --c-ent:#62b6ea; --c-ped:#8fcb6b; --c-max:#a3b0b8;
+  --good:#6cc48f; --warn:#e0a050; --w1:#6cc6c9; --w2:#e8c565; --w3:#ee9550; --w4:#ea6a62; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1a1f; --surface:#13252c; --ink:#e4eef1; --muted:#90a6af; --line:#26414b; --accent:#4fbcc3; --accent-ink:#06191c;
+  --c-sur:#4fbcc3; --c-ort:#8d99f2; --c-ob:#e47fb0; --c-eye:#e2b13f; --c-ent:#62b6ea; --c-ped:#8fcb6b; --c-max:#a3b0b8;
+  --good:#6cc48f; --warn:#e0a050; --w1:#6cc6c9; --w2:#e8c565; --w3:#ee9550; --w4:#ea6a62; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.55;padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:4px;padding-bottom:4px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+h1{margin:0;font-size:clamp(22px,4.4vw,32px);line-height:1.2;font-weight:700;text-wrap:balance}
+.sub{color:var(--muted);margin:0}
+h2{margin:0;font-size:17px;font-weight:600;text-wrap:balance}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel-head{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:space-between;align-items:baseline}
+.note{color:var(--muted);font-size:12.5px;margin:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-size:30px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12.5px;color:var(--muted)}
+.kpi.main{background:var(--accent);border-color:var(--accent)}
+.kpi.main .l,.kpi.main .s,.kpi.main .v{color:var(--accent-ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+svg text{font-family:var(--font);fill:var(--muted);font-size:11px}
+svg .val{fill:var(--ink);font-weight:600;font-family:var(--mono)}
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block;width:100%;min-width:560px;height:auto}
+.bar{cursor:pointer}
+.detail{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px;min-height:44px}
+.detail b{font-size:15px}
+.detail .chip{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px}
+th{font-weight:600;color:var(--muted);font-size:12px;position:sticky;top:0;background:var(--surface)}
+th:first-child,td:first-child{text-align:left}
+tfoot td{font-weight:700;border-top:2px solid var(--line);border-bottom:none}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:8px;max-height:560px;overflow-y:auto}
+.tw table td:first-child,.tw table th:first-child{position:sticky;left:0;background:var(--surface);z-index:1;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.tot{font-weight:600;background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.zero{color:var(--muted);opacity:.45}
+.deptrow{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:8px 14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.deptrow:last-child{border-bottom:none}
+.dn{display:flex;align-items:center;gap:8px;font-weight:500;min-width:0}
+.dbar{display:flex;align-items:center;gap:10px;min-width:0}
+.track{flex:1;height:10px;background:color-mix(in srgb,var(--muted) 16%,transparent);border-radius:5px;overflow:hidden;min-width:60px}
+.track i{display:block;height:100%;border-radius:5px}
+.dnum{font-variant-numeric:tabular-nums;font-weight:600;min-width:150px;text-align:right;white-space:nowrap}
+.dnum small{font-weight:400;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:999px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tab:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+input[type=search]{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0;width:100%;max-width:260px}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.prop{display:flex;height:22px;border-radius:6px;overflow:hidden;gap:2px}
+.prop i{display:block;height:100%}
+.prop-l{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;font-variant-numeric:tabular-nums}
+.topop{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 52px;gap:6px 10px;align-items:center;font-size:13px}
+.topop .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topop .nm em{font-style:normal;color:var(--muted);font-size:12px}
+.topop .tk{height:8px;background:color-mix(in srgb,var(--muted) 16%,transparent);border-radius:4px;overflow:hidden}
+.topop .tk i{display:block;height:100%;border-radius:4px}
+.topop .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+ul.notes{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+@media (max-width:560px){.deptrow{grid-template-columns:1fr}.dnum{text-align:left}}
+@media (prefers-reduced-motion:no-preference){.track i,.topop .tk i{transition:width .4s}}
+.view[hidden]{display:none!important}.view{display:flex;flex-direction:column;gap:18px;min-width:0}.vhead{display:flex;flex-direction:column;gap:4px}.nav{display:flex;flex-wrap:wrap;gap:8px}.nav .tab{font-size:14px;padding:7px 16px}
+.callout{background:color-mix(in srgb,var(--w4) 7%,var(--surface));border:1px solid color-mix(in srgb,var(--w4) 30%,var(--line));border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.callout h2{font-size:16px}.callout ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}.callout li{line-height:1.6}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.sc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.sc-hi{border-color:var(--w4);box-shadow:inset 0 3px 0 var(--w4)}.sc-warn{border-color:color-mix(in srgb,var(--w3) 60%,var(--line));box-shadow:inset 0 3px 0 var(--w3)}
+.sc-t{font-size:13px;color:var(--muted);font-weight:500}.sc-v{font-size:30px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}.sc-s{font-size:12px;color:var(--muted);min-height:34px}
+.spark{display:block;width:100%;height:34px}
+.chip{align-self:flex-start;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip.hi{background:color-mix(in srgb,var(--w4) 14%,transparent);border-color:color-mix(in srgb,var(--w4) 45%,transparent);color:var(--w4);font-weight:600}
+.chip.warn{background:color-mix(in srgb,var(--w3) 14%,transparent);border-color:color-mix(in srgb,var(--w3) 45%,transparent);color:var(--w3);font-weight:600}
+.mx-hi{background:var(--w4)!important;color:#fff;font-weight:700}
+#mx td:first-child,#mx th:first-child{white-space:normal;min-width:190px}
+select{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0;max-width:100%}
+select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rl{display:flex;flex-direction:column;gap:8px}.ri{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rh{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:13px}.rh .chip{align-self:auto}.rt{font-size:13.5px;overflow-wrap:anywhere}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">ปีงบประมาณ 2569 · ต.ค. 2568 – ก.ย. 2569</div>
+  <h1>ยอดผ่าตัดประจำปีงบประมาณ 2569</h1>
+  <p class="sub">รวมทุกแผนก แยกตามรายเดือนและตามหัตถการ จากชีต “สรุปยอดรวมแต่ละแผนกปีงบประมาณ 2569”</p>
+</header>
+<nav id="nav" class="nav" aria-label="มุมมอง"><button type="button" class="tab" data-v="ops" aria-pressed="true">ภาพรวมการผ่าตัด</button><button type="button" class="tab" data-v="risk" aria-pressed="false">ความเสี่ยง</button></nav>
+<div class="view" id="view-ops">
+<section class="kpis" id="kpis" aria-label="ตัวเลขสำคัญ"></section>
+
+<section class="panel" aria-labelledby="h-month">
+  <div class="panel-head"><h2 id="h-month">ยอดผ่าตัดรายเดือน แยกตามแผนก</h2><p class="note">แตะหรือวางเมาส์บนแท่งเพื่อดูรายละเอียดของเดือน</p></div>
+  <div class="legend" id="legend"></div>
+  <div class="chartbox"><svg id="chart" role="img" aria-label="กราฟแท่งซ้อนแสดงยอดผ่าตัดรายเดือนแยกตามแผนก"></svg></div>
+  <div class="detail" id="detail" aria-live="polite"></div>
+</section>
+
+<section class="panel" aria-labelledby="h-dept">
+  <div class="panel-head"><h2 id="h-dept">สรุปยอดรายแผนก</h2><p class="note">สัดส่วนเทียบกับยอดผ่าตัดทั้งหมด</p></div>
+  <div id="depts"></div>
+</section>
+
+<section class="panel" aria-labelledby="h-heat">
+  <div class="panel-head"><h2 id="h-heat">แผนก × เดือน</h2><p class="note">สีเข้มคือเดือนที่ผ่าตัดมากเมื่อเทียบกับแผนกเดียวกัน</p></div>
+  <div class="tw" style="max-height:none"><table id="heat"></table></div>
+</section>
+
+<section class="panel" aria-labelledby="h-ops">
+  <div class="panel-head"><h2 id="h-ops">ยอดแต่ละ operation รายเดือน</h2><p class="note" id="opsnote"></p></div>
+  <div class="tools">
+    <div class="tabs" id="tabs" role="group" aria-label="เลือกแผนก"></div>
+    <input type="search" id="q" placeholder="ค้นหาชื่อ operation" aria-label="ค้นหาชื่อ operation">
+  </div>
+  <div class="tw"><table id="ops"></table></div>
+</section>
+
+<div class="split">
+  <section class="panel" aria-labelledby="h-top">
+    <h2 id="h-top">12 หัตถการที่ทำมากที่สุด</h2>
+    <div class="topop" id="top"></div>
+  </section>
+  <section class="panel" aria-labelledby="h-type">
+    <h2 id="h-type">สัดส่วนตามชีตสรุปยอดรวม</h2>
+    <div id="types" style="display:flex;flex-direction:column;gap:14px"></div>
+    <p class="note">ตัวเลขสองชุดนี้อ่านจากชีตสรุป แต่ละชุดรวมได้ 3,824 ราย เท่ากับยอดรวมทุกแผนก</p>
+  </section>
+</div>
+
+
+</div>
+<div class="view" id="view-risk" hidden>
+  <header class="vhead">
+    <div class="eyebrow">รายงานความเสี่ยง · ต.ค. 2568 – ก.ย. 2569</div>
+    <h1 style="font-size:clamp(20px,3.6vw,26px)">ความเสี่ยงในห้องผ่าตัด</h1>
+    <p class="sub" id="rsub">สรุปจากทะเบียนรายงานความเสี่ยง ไม่แสดงชื่อ HN ของผู้ป่วย หรือชื่อบุคลากร</p>
+  </header>
+
+  <section class="callout" aria-labelledby="h-sum">
+    <h2 id="h-sum">ประเด็นเด่นของปีงบประมาณนี้</h2>
+    <ul id="sum"></ul>
+  </section>
+
+  <section class="score" id="score" aria-label="ตัวชี้วัดความเสี่ยงหลัก"></section>
+
+  <section class="panel" aria-labelledby="h-mon">
+    <div class="panel-head"><h2 id="h-mon">รายงานความเสี่ยงรายเดือน แยกตามสาขา</h2><p class="note">ตัวเลขบนแท่งคือจำนวนรายการ แถบแดงคือเดือนที่สูงผิดปกติ (≥ 1.5 เท่าของค่ากลางของปี)</p></div>
+    <div class="legend" id="lg-mon"></div>
+    <div class="chartbox"><svg id="ch-mon" role="img" aria-label="กราฟแท่งซ้อนแสดงจำนวนรายงานความเสี่ยงรายเดือนแยกตามสาขา"></svg></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-mx">
+    <div class="panel-head"><h2 id="h-mx">ประเภทความเสี่ยง × เดือน</h2>
+      <p class="note">ช่องสีแดง = สูงผิดปกติ (≥ 1.5 เท่าของค่ากลางของปีและตั้งแต่ 5 รายการขึ้นไป) 1 รายการอาจอยู่ได้หลายประเภท จึงรวมกันได้มากกว่ายอดรวม</p></div>
+    <div class="tw" style="max-height:none"><table id="mx"></table></div>
+  </section>
+
+  <div class="split">
+    <section class="panel" aria-labelledby="h-br">
+      <div class="panel-head"><h2 id="h-br">รายสาขา</h2><p class="note">อัตรา = รายงานความเสี่ยง ต่อ 100 ผ่าตัดของสาขานั้น</p></div>
+      <div id="br"></div>
+    </section>
+    <section class="panel" aria-labelledby="h-seg">
+      <div class="panel-head"><h2 id="h-seg">เทียบกับยอดผ่าตัด</h2><p class="note">รายงานความเสี่ยง ต่อ 100 ผ่าตัด</p></div>
+      <div class="tw" style="max-height:none"><table id="seg"></table></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="h-ls">
+    <div class="panel-head"><h2 id="h-ls">รายการความเสี่ยง</h2><p class="note" id="ls-note"></p></div>
+    <div class="tools">
+      <div class="tabs" style="gap:8px">
+        <select id="f-m" aria-label="เดือน"></select>
+        <select id="f-b" aria-label="สาขา"></select>
+        <select id="f-c" aria-label="ประเภทความเสี่ยง"></select>
+      </div>
+      <input type="search" id="f-q" placeholder="ค้นหาในรายละเอียด" aria-label="ค้นหาในรายละเอียด">
+    </div>
+    <div class="rl" id="rl" aria-live="polite"></div>
+    <button type="button" class="tab" id="more" hidden>แสดงเพิ่ม</button>
+  </section>
+</div>
+</div>
+
+<script>
+const A=(n,s)=>({n,v:s.split(',').map(Number)});
+const S=(n,o)=>{const v=Array(12).fill(0);for(const k in o)v[k]=o[k];return {n,v}};
+const DEPTS=[
+{id:'sur',name:'ศัลยกรรม',tab:'ศัลยกรรม',exp:[140,145,170,122,131,206,125,136,292,136,321,160],ops:[
+A('Excision','18,18,12,6,4,11,11,21,24,17,12,18'),
+A('CNBx','2,1,0,1,0,0,0,0,1,0,0,3'),
+A('Excision breast mass','1,1,0,1,1,2,0,0,1,0,0,0'),
+A('Appendectomy','10,17,20,11,22,20,12,18,20,17,28,20'),
+S('Lap Appendectomy',{9:1}),
+A('I&D','4,0,0,1,2,2,0,3,2,2,2,0'),
+A('O&D','0,4,3,6,6,1,5,2,2,5,2,3'),
+A('Nail extraction','0,0,0,0,0,1,0,0,0,0,0,1'),
+A('Suture wound','3,1,4,1,1,0,2,4,6,4,2,2'),
+A('Debridement','13,12,16,8,5,13,11,11,7,5,13,6'),
+A('Repair umbilicalhernia','0,0,1,0,0,1,0,0,0,0,1,0'),
+A('Hernioplasty','8,18,8,5,7,8,8,6,12,11,10,14'),
+S('Herniotomy',{10:1}),
+A('Circumcision','1,1,0,0,2,1,1,0,5,2,1,2'),
+S('Derssing wound',{11:1}),
+A('EGD','22,31,36,19,20,14,22,23,16,20,22,29'),
+S('EGD c polypectomy',{11:1}),
+A('Colonoscopy','22,14,19,18,19,60,12,16,121,17,145,20'),
+A('Colonoscopy c polypectomy','5,2,2,7,4,25,1,1,27,1,35,3'),
+A('EGD+Colonoscopy c polypectomy','0,0,0,0,0,0,3,0,0,0,1,1'),
+A('EGD+Colonoscopy','3,2,3,0,2,1,5,2,3,0,4,3'),
+A('Excision hemorrhoid','2,0,2,2,2,0,0,1,1,0,3,3'),
+A('Hemorrhoidectomy','2,1,1,1,2,3,0,2,2,1,3,2'),
+A('Open Cholecystectomy','0,0,0,2,0,0,0,0,0,1,3,0'),
+S('Partial Cholecystectomy',{2:1}),
+A('Remove foreign body','0,0,0,1,1,1,1,0,0,0,0,0'),
+A('Exploratory Laparotomy','0,0,0,3,2,1,1,3,4,3,3,1'),
+A('Exploratory sigmoidectomy','1,1,1,0,0,1,1,0,3,2,1,1'),
+A('Exploratory Gastojejunostomy','0,0,0,0,0,0,0,1,0,0,0,2'),
+A('Exploratory Laparotomy c lysis adhesion','1,1,2,0,0,3,0,0,1,2,0,0'),
+S('Total gastectomy',{3:1}),
+S('Suture Duodenal ulcer perforate',{1:1,4:2}),
+A('Fasciotomy','1,0,0,0,0,1,0,0,0,2,0,0'),
+A('Fistulectomy','0,0,1,0,0,1,0,1,1,0,0,0'),
+A('EL c Hemicolectomy','0,1,0,1,3,4,2,1,5,1,1,2'),
+A('Colostomy','1,3,4,2,1,1,2,1,0,0,3,2'),
+A('Below knee Amputation','1,1,1,0,1,1,1,0,3,1,0,0'),
+S('Above knee Amputation',{5:1,6:1}),
+A('Amputation','3,3,8,3,5,7,0,0,1,5,8,2'),
+S('Intraperitoneal drainage',{9:1}),
+S('Incisional Biopsy',{0:1}),
+S('Excisional biopsy',{3:1,11:1}),
+S('Biopsy',{5:2}),
+A('Repair Hernia','1,0,0,0,0,1,1,0,0,1,0,0'),
+S('Repair bladder',{3:1,8:1}),
+S('Orchidectomy',{2:1,3:2,6:1}),
+A('LC','9,7,6,6,5,9,8,8,8,4,3,8'),
+S('Tracheostomy',{10:2,11:1}),
+S('Aspiration abscess',{1:1}),
+A('Modified Radical Mastectomy','1,0,0,1,0,1,1,2,1,0,0,0'),
+A('EL c Small bowel resection','0,0,3,0,0,0,1,2,2,1,1,0'),
+S('EL c Total colectomy',{9:1}),
+S('EL c Subtotal colectomy',{2:1}),
+S('Suture colon',{3:1,8:1}),
+A('EL c Simple closure Gastic ulcer','0,0,2,0,0,0,0,1,0,2,1,0'),
+S('EL C Low Anterior resection',{4:1,6:4}),
+S('Simple closure duodenum',{10:1}),
+A('EL c Gastrostomy','1,0,3,0,0,1,1,0,0,1,0,0'),
+A('Chang FJ','0,0,0,4,2,0,0,0,1,0,0,0'),
+A('Lysis toung tie','0,2,6,3,2,3,2,1,3,3,3,6'),
+S('Venous stripping',{8:1}),
+S('Vacuum Dressing',{6:1}),
+S('Exploration wound',{8:2}),
+S('Stop bleeding by cauterization',{5:1,9:1}),
+S('Core needdle biopsy',{3:1}),
+S('Repair artery',{1:1}),
+S('Altemier Procedure',{8:1}),
+A('Remove FB','0,0,0,1,0,0,0,1,0,1,0,1'),
+A('Lap TEP','1,0,1,0,1,1,0,2,1,0,1,1'),
+A('Fistulotomy','1,0,0,1,3,1,0,1,0,0,0,0'),
+S('EGD c incisional biopsy',{0:1}),
+A('EL with Feedingjejunostomy','0,0,2,0,1,0,3,1,1,0,1,0'),
+S('Retain Foley catheter',{4:1}),
+S('Laparoscopic Dx.',{5:1}),
+S('Laparoscopic Colectomy',{4:1,8:1,10:1}),
+S('EL c Hernioplasty',{10:2}),
+S('Breast augmentation',{10:1})
+]},
+{id:'ort',name:'ศัลยกรรมกระดูกและข้อ',tab:'ศัลยกรรมกระดูกและข้อ',exp:[73,75,75,82,113,93,87,83,78,82,95,72],ops:[
+A('Debridement','5,10,13,10,17,16,16,8,5,4,11,4'),
+A('DB open Fx.','4,1,5,1,2,0,0,0,1,0,2,0'),
+A('DB with PAS','0,0,0,0,1,2,2,2,0,3,1,1'),
+A('DB with K-wire','3,5,3,4,3,1,2,1,4,5,4,5'),
+A('DB with repair tendon','2,3,1,7,4,11,6,11,4,5,11,7'),
+A('CRIF with PAS','0,2,0,0,0,0,2,1,0,0,0,2'),
+A('CRIF with K-wire','2,3,1,1,2,3,1,0,3,5,6,1'),
+S('CRIF with Screw',{9:1}),
+A('CRIF with TBW','0,1,2,0,0,1,1,1,0,0,1,0'),
+A('CRIF with IM nailing','1,0,2,0,2,1,2,0,0,0,1,2'),
+S('CRIF with multiple screw',{0:1}),
+S('CRIF with Hook plate',{3:1}),
+A('CRIF with Proximal femoral nailing','5,1,2,1,2,2,0,3,2,4,1,2'),
+S('ORIF with .....',{1:1,8:1}),
+A('ORIF with PAS','19,15,12,15,27,12,17,14,15,15,13,18'),
+A('ORIF with K-wire','1,4,0,2,1,0,2,2,0,1,1,1'),
+A('ORIF with Screw','4,0,0,0,1,1,3,1,1,0,0,0'),
+S('ORIF with multiple screw',{4:1}),
+A('ORIF with Proximal femoral nailing','0,1,2,1,0,1,2,0,0,0,0,0'),
+S('ORIF with IM nailing',{11:1}),
+S('CREF',{11:1}),
+A('External fixation spanning','1,1,0,0,0,0,0,0,2,0,1,0'),
+A('Removal of internal fixation device','5,3,5,3,6,9,9,8,7,3,4,2'),
+S('Removal of external fixation device',{4:1,6:1}),
+A('Repair tendon','1,1,4,2,5,2,1,0,2,3,1,3'),
+A('Release carpal tunnel','2,3,2,2,3,4,4,4,4,6,4,3'),
+S('Release dequervain',{0:1,4:1,7:1,8:1}),
+S('Release cubital tunnel',{0:1,8:1}),
+A('Trigger finger','1,2,1,0,0,2,3,2,5,3,0,0'),
+S('Repair nail bed',{4:1,5:1,7:2}),
+S('Biopsy',{7:1}),
+A('Excision','2,3,0,0,3,4,1,0,2,1,5,2'),
+A('Tenolysis','0,1,2,1,2,1,0,0,1,1,2,0'),
+S('I&D',{7:1,9:1,11:1}),
+S('O&D',{5:2}),
+A('BKA','1,1,1,1,0,0,0,1,0,0,0,0'),
+S("Ray's Amputation",{5:1}),
+A('Amputation toe','1,0,1,5,3,1,0,2,0,0,1,1'),
+S('Amputation finger',{4:1,9:1,10:1}),
+A('Close reduction','2,3,0,1,2,0,0,0,1,5,0,0'),
+S('Open reduction',{0:1,3:1}),
+S('Suture wound',{2:1,3:1,7:1,8:1}),
+A('Arthrotomy','1,1,2,4,2,0,1,2,1,0,1,1'),
+S('Remove foreign body',{1:1,2:2,3:1,7:1,10:2}),
+S('STSG',{4:1}),
+S('V-Y flab',{10:1}),
+A('Vacuum dressing','0,0,2,3,1,5,0,0,0,0,0,0'),
+S('Vacuum dressing wound',{4:1}),
+S('Resuture',{2:1}),
+S('Excisional Biopsy',{10:1}),
+S('Fasciotomy',{4:1,9:1}),
+A('Total hip arthoplasty','2,0,3,0,0,3,3,0,1,4,3,1'),
+S('Cementless total Hip arthoplasty',{0:1}),
+A('Bipolar Hemiarthoplasty','0,0,1,5,1,2,1,3,0,3,2,1'),
+S('Cementless bipolar Hemiarthoplasty Hip',{11:1}),
+S('Revise total hip arthroplasty',{10:1}),
+S('Revision PAS',{4:1}),
+S('Revision TBW',{4:1}),
+A('Total knee arthroplasty','2,7,4,9,12,5,7,10,13,7,13,11'),
+S('Soft tissue release',{4:1}),
+S('Revision internal fixation',{0:1,1:1})
+]},
+{id:'ob',name:'สูติ-นรีเวชกรรม',tab:'สูติกรรม',exp:[56,46,48,42,30,26,39,20,36,37,34,40],ops:[
+A('LTc/s','31,30,29,29,18,15,20,10,19,17,18,28'),
+A('PPTR','12,7,6,2,1,4,7,1,5,11,10,7'),
+A('D&C','1,1,1,3,2,1,1,2,1,1,1,2'),
+A('F&C','5,4,1,4,4,1,6,1,8,2,1,0'),
+A('TAH','1,1,1,1,0,3,0,0,0,0,1,0'),
+S('Cystectomy',{8:1}),
+S('Salphingo-oophorectomy',{2:1,4:1,11:1}),
+S('Myomectomy',{8:1}),
+S('SPTR',{0:1,3:2,11:1}),
+S('Explor lap',{4:1,5:1}),
+S('TVH c A-P Repair',{0:1}),
+S('I&D',{6:1}),
+S('Salphingectomy',{1:1,2:2,3:1,7:2}),
+S('Remove implant',{10:1}),
+S('Remove FB',{5:1,7:1}),
+A('LEEP','1,0,3,0,2,0,3,2,1,5,2,1'),
+S('Excision',{4:1}),
+S('Suture wound',{2:1}),
+S('Evacuate hematoma',{1:1,6:1}),
+S('Repair of ovary',{7:1}),
+S('Polypectomy',{2:1,9:1}),
+S('Debridement',{0:2,1:1,2:2}),
+S('D&C with PPTR',{0:1})
+]},
+{id:'eye',name:'จักษุ (EYE)',tab:'EYE',exp:[15,11,38,27,34,15,25,7,0,9,16,21],ops:[
+A('Phaco c IOL','13,11,36,26,31,9,22,6,0,7,14,19'),
+S('PEX',{5:1,9:1}),
+A('PEX c Conjungtival graft','0,0,2,1,2,5,2,1,0,0,1,1'),
+S('Excision',{4:1}),
+S('I+C',{0:1,6:1,9:1}),
+S('Blepharoplasty',{10:1,11:1}),
+S('Ptosis correction',{0:1})
+]},
+{id:'ent',name:'หู คอ จมูก (ENT)',tab:'ENT/กุมารฯ',exp:[0,0,8,10,13,10,2,2,0,0,0,0],ops:[
+A('Excision','0,0,3,5,6,5,2,1,0,0,0,0'),
+S('I&D',{2:1}),
+S('Tonsillectomy',{3:1,4:2,5:1}),
+S('Tonsillectomy c adenoidectomy',{2:1,4:2,5:1}),
+S('Lobectomy',{3:1,5:2}),
+S('Total Thyroidectomy',{4:1}),
+S('Biopsy',{3:1}),
+S('Tracheostomy',{2:1,3:2}),
+S('Lysis tongue tie',{4:2}),
+S('DL c mapping',{2:2,7:1}),
+S('Debridement',{5:1})
+]},
+{id:'ped',name:'กุมารเวชกรรม',tab:'ENT/กุมารฯ',exp:[5,2,3,1,0,0,0,0,0,1,0,0],ops:[
+A('Lysis toung tie','5,2,3,1,0,0,0,0,0,1,0,0')
+]},
+{id:'max',name:'Maxillofacial',tab:'Maxillofacial',exp:[0,0,0,0,0,0,0,0,0,1,1,1],ops:[
+S('I&D',{9:1}),
+S('O&D',{11:1}),
+S('Nasal bone reduction',{10:1})
+]}
+];
+
+const RISK_CATS=[["doc", "เอกสาร/ใบประเมิน/ยินยอม/LAN"], ["id", "ระบุตัวผู้ป่วย/ข้างผ่าตัด"], ["inst", "เครื่องมือ/เซต/ผ้า/วัสดุ"], ["ster", "ความปราศจากเชื้อ/สะอาด"], ["prep", "เตรียมผู้ป่วย (ถอดของ/NPO/เล็บเจล)"], ["med", "ยา/ATB/สารน้ำ"], ["env", "อุปกรณ์/สิ่งแวดล้อม/ระบบ"], ["clin", "ภาวะแทรกซ้อน/เหตุการณ์ทางคลินิก"], ["post", "เลื่อน/ยกเลิก (Off case)"], ["comm", "การสื่อสาร/ส่งต่อข้อมูล"], ["staff", "บุคลากรได้รับอันตราย"], ["oth", "อื่นๆ / ไม่ระบุรายละเอียด"]];
+const RISK=[[0,1,"O",1,"I","inst","1.เครื่องมือ Off Screw ไม่เพียงพอ 2.Screw เกลียวหวาน 3.Off Screw ออกได้ไม่หมด"],[0,1,"O",1,"I","inst","Revision plate"],[0,2,"S",2,"I","doc","โปรแกรมส่องกล้องไม่ลิ้งรูปไปคอม. รูปไม่ขึ้น"],[0,3,"G",2,"I","env","08.00น. ไฟตก แอร์ห้องผ่าตัด 1-7 ไม่ทำงาน Error code : Low air flow"],[0,3,"O",1,"I","inst,env","แบตเตอรี่ปืนชาร์จไฟไม่เข้า"],[0,3,"S",1,"I","inst","Set excision Lot.3009680203 ขาดถ้วยน้ำยา 1 ชิ้น"],[0,3,"S",1,"I","inst","Set excision Lot.3009680203 needle holder เกิน 1 ชิ้น"],[0,3,"O",1,"N","inst,clin,post","1. เครื่องมือบริษัทมาส่ง 23.45น.ทำให้นึ่งเครื่องมือไม่ทันใช้รอบเช้า เลื่อนจาก10.00น.เป็น 15.00น. 2. EBL = 1,800 ml."],[0,3,"P",1,"I","doc","ไม่มีใบยินยอมผ่าตัด"],[0,3,"S",2,"I","doc","ไม่LAN"],[0,5,"-",0,"-","post","Off case Pt O2 sat drop = 88 mg% , HR เร็ว = 120/min"],[0,7,"G",2,"I","ster,env","แอร์ห้องส่งของ sterile error มีเชื้อราที่ช่องแอร์ และมีน้ำหยดที่กำแพงเป็นจำนวนมาก"],[0,7,"O",1,"I","inst","set Instrument สำหรับผ่าตัด ถูกเก็บในห้องส่งของ sterile ที่ระบบความคุมอุณหภูมิและความชื้น ชำรุด"],[0,8,"G",2,"I","prep","ผู้ป่วยไม่ได้ถอด Retainer มา , เครื่อง Transport Incubator Alarm ตลอดเวลา"],[0,9,"S",2,"I","doc","ไม่LAN"],[0,9,"O",3,"I","doc,prep","1.ไม่LAN 2.ไม่ได้ถอดสร้อยคอ, 3.ไม่มีใบเตรียมผ่าตัด"],[0,9,"S",3,"N","doc","ไม่มีใบเซ็นต์ยินยอม มาจากตึก VIP6"],[0,11,"S",2,"N","clin","ฟันหลุด 4 ซี่"],[0,14,"S",3,"N","clin","SSI"],[0,16,"O",2,"I","doc,ster,med","1ไม่มีใบเซ็นยินยอมการผ่าตัด 2.พยาบาลสคลับโดนหยดน้ำจากเครื่องนึ่ง ทำให้นิ้วที่สัมผัสเบิร์น"],[0,17,"O",1,"I","staff","hook ทิ่มมือscrub"],[0,18,"G",1,"N","comm","โทรตามผู้ป่วยเวลา 13.05 น ผู้ป่วยมาถึง OR เวลา 13.37 น."],[0,19,"S",2,"N","doc,inst,clin,post","ไม่LAN · Set EGD off case ที่ OR ผู้ป่วยหลง ไม่ให้ความร่วมมือ จะทำร้ายจนท."],[0,19,"S",2,"N","doc,inst,post","Set EGD 1.off case ที่OR ผู้ป่วยปฏิเสธ 2.ไม่LAN"],[0,20,"S",1,"I","doc","ไม่มีใบนำส่งผ่าตัด"],[0,20,"O",1,"N","doc","ไม่LAN"],[0,21,"O",1,"I","clin","1.Tonique ไม่ดี คนไข้เกิด Bleb 2. op-time 3 ชั่วโมง 25 นาที"],[0,21,"S",1,"N","comm","ตอน Set case/รับเคส ไม่ได้แจ้งว่า เชื้อดื้อยา MDR"],[0,21,"S",2,"N","env","แอร์รวมมีปัญหา ตัดระบบเองตั้งแต่วันที่1/10/68 ยังแก้ปัญหาไม่ได้ ทำให้ระบบความเย็นห้องเก็บของมีปัญหา อุณหภูมิที่ควบคุมไม่เป็นไปตามที่กำหนด และความชื้นสัมพัทธ์อยู่ในช่วง 65-90%"],[0,21,"S",4,"N","inst","Set เสื้อกาวน์กันน้ำ Lot.1410680501 ด้านในเป็นเสื้อกาวน์ธรรมดา"],[0,23,"O",3,"N","med","Order Cefazoline 2 gm. To OR แต่ไม่มียาขึ้นมา OR"],[0,23,"S",3,"N","doc","ไม่ส่งแบบบันทึกผู้ป่วยก่อนผ่าตัด"],[0,24,"S",3,"N","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[0,28,"G",1,"I","doc","ไม่ Lan ผ่าตัด"],[0,28,"S",1,"I","inst","Set Excision มีฝุ่น เปลี่ยน Set"],[0,29,"S",2,"I","prep,env","เชื่อมต่อ อัพโหลด ผล scope เข้าระบบ film ไม่ได้ (ปลั๊ก ราวเตอร์ ถูกถอดออก)"],[0,29,"S",2,"I","inst","พบมด ในซอง วิวแพค ชั้นใน ของเครื่องมือ extra"],[0,29,"O",2,"I","inst,ster","set เสื้อกราวน์ไม่มี sterigate"],[0,29,"S",1,"I","doc","ไม่มีใบเตรียมผ่าตัด"],[0,29,"G",1,"I","doc","ไม่มีใบเตรียมผ่าตัด"],[0,29,"S",2,"I","doc","1.ไม่ Lan ผ่าตัด 2.โปรแกรมกล้องเปิดไม่ได้"],[0,29,"O",1,"I","doc","ไม่ Lan ผ่าตัด"],[0,29,"O",1,"N","comm","ตามเวรเปลไม่ได้ ทำให้ส่งคนไข้มาช้า เป็นเวลา 1 ชั่วโมง"],[0,29,"O",2,"N","doc","คนไข้ไม่ได้เซ็นใบยินยอมมา"],[0,30,"O",1,"I","inst,ster","Set กะละมัง ortho Lot.2810680204 ไม่มี sterigate"],[0,30,"S",2,"N","doc","ไม่มีแบบบันทึกการประเมินผู้ป่วยก่อนผ่าตัด"],[0,31,"O",1,"I","comm","ตามผู้ป่วยเวลา 19.35 น. ผู้ป่วยมาถึง 20.05 น."],[0,31,"O",1,"I","doc","ไม่มีใบเซ็นยินยอมในห้องผ่าตัด"],[1,2,"S",2,"N","clin","ไส้ติ่งแตกระหว่างผ่าตัด"],[1,5,"G",2,"N","clin","Adhesion ติดผนังหน้าท้อง Consult ศัลย์มา Lysis Adhesion"],[1,6,"G",2,"I","inst,ster","Set swab ในกะละมัง มีเศษพริก เครื่อง2/รอบ2"],[1,6,"O",1,"N","id","ไม่มีป้ายข้อมือ (เป็นของ รพ.บ้านเหลื่อม)"],[1,6,"S",2,"N","inst,comm","ตึกลืมset case แพทย์order ตอน22.00น. Set OR for EGD LA 23.00น. ตึกโทรมาset ตอน 23.00น."],[1,7,"S",3,"I","doc","ไม่ส่ง LAN"],[1,7,"G",2,"I","inst","Set LT c/s Lot. 0611680202 tower clip ขาด 1 ตัว"],[1,9,"S",2,"N","prep","ไม่ได้ถอด Retainer"],[1,11,"-",0,"-","post","Off case at OR เปลี่ยนใจไม่ผ่าตัด ขอเลื่อนเป็นพรุ่งนี้"],[1,11,"S",2,"N","clin","SSI แผลมีหนอง"],[1,11,"S",3,"N","doc,clin,post","off case at ward เนื่องจากมี diaphramatic hernia S/P ผ่าตัดปอดจากการถูกแทง plan refer MHR"],[1,12,"S",2,"I","doc","ไม่ส่งแลนใบเตรียมผู้ป่วยก่อนผ่าตัด"],[1,12,"G",2,"I","doc","ไม่มีใบเซ็นยินยอมผ่าตัด/ไม่มีใบเตรียมผู้ป่วยก่อนผ่าตัด"],[1,12,"S",3,"N","doc","ไม่ส่งแลนใบเตรียมผู้ป่วยก่อนผ่าตัด"],[1,12,"S",3,"N","doc","ไม่มีใบเตรียมผู้ป่วยก่อนผ่าตัด"],[1,12,"S",2,"N","doc","ไม่ส่ง LAN"],[1,12,"O",3,"N","doc","ไม่ส่ง LAN"],[1,13,"O",1,"N","post","เลื่อนเวลาเริ่ม case เนื่องจาก.....???"],[1,13,"G",2,"I","inst","เสื้อกาวน์Lot.0911680102 เชือกไม่ครบ 2 เส้น"],[1,13,"O",2,"N","inst","เสื้อกาวน์Lot.0911680102 เชือกไม่ครบ 1 เส้น"],[1,14,"O",1,"I","inst","เสื้อกาวน์Lot.0911680202 เชือกไม่ครบ 1 เส้น"],[1,14,"G",2,"I","inst","ผ้าห่อsetเสื้อกาวน์Lot.0911680102 ขาดเป็นรู"],[1,14,"S",3,"N","inst","เสื้อกาวน์Lot.1111680101 เชือกไม่ครบ 2 เส้น"],[1,15,"O",3,"N","inst","เสื้อกาวน์Lot.1111680101 เชือกไม่ครบ 1 เส้น"],[1,15,"O",1,"N","inst","เครื่องมือ PFNA ไม่พร้อมใช้งาน"],[1,17,"Y",1,"I","inst","เสื้อกาวน์Lot.1311680202 เชือกไม่ครบ 1 เส้น"],[1,17,"Y",1,"I","inst","เสื้อกาวน์Lot.1311680202 เชือกไม่ครบ 1 เส้น"],[1,17,"Y",1,"I","inst","เสื้อกาวน์Lot.1311680202 เชือกไม่ครบ 1 เส้น"],[1,17,"Y",1,"I","inst","เสื้อกาวน์Lot.1311680202 เชือกไม่ครบ 1 เส้น"],[1,17,"O",1,"I","inst","เสื้อกาวน์Lot.1311680202 เชือกไม่ครบ 1 เส้น"],[1,17,"G",2,"I","inst","ถุงมือแพทย์ขาด"],[1,17,"G",2,"I","inst,ster","ผ้าเจาะกลางในset curette Lot.2310680102 ขอบผ้าเป็นขุย"],[1,17,"O",2,"I","doc","ไม่มีใบเซ็นยินยอมผ่าตัด,ไม่ส่งแลนมาให้ OR"],[1,18,"O",1,"I","inst,clin","ผ้าห่อsetขาดเป็นรูทะลุ"],[1,18,"G",1,"I","inst","เสื้อกาวน์Lot.1411680202 เชือกขาด 1 เส้น"],[1,18,"G",2,"I","inst,ster","ผ้าsheet ในset ผ้าmajor Lot.1711680202 ขอบผ้าเป็นขุย"],[1,18,"O",2,"N","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[1,19,"O",1,"I","inst","setเสื้อกาวน์4 ตัวLot.1711680102 เชือกผูกเสื้อขาด 1 เส้น ทั้งหมด 3 ตัว"],[1,19,"G",1,"I","doc","ไม่ส่ง Lan ผ่าตัด"],[1,20,"O",3,"I","inst","เสื้อกาวน์Lot.1711680101 เชือกขาด 2 เส้น"],[1,20,"O",2,"I","doc","ไม่มีใบเซ็นยินยอม/ไม่มีใบส่งคนไข้มาผ่าตัด"],[1,20,"O",1,"I","doc","ไม่มี implant บริษัทไม่ได้ส่งของมา คนไข้ SB รอของมาจาก MHR"],[1,22,"O",3,"N","doc,med","1. ตึกศอ.ไม่ได้เอายา Vanco 2 vial มาพร้อมผู้ป่วย 2. ไม่ Lan แบบบันทึกผู้ป่วยก่อนผ่าตัด ใน Ichart"],[1,24,"O",4,"I","inst","Revision k-wire Lt fibula"],[1,24,"O",1,"I","inst,post","Set OR เวลา 15.00 เป็นเคสที่2 แต่เคสแรกเสร็จ 15.29น. และมีเคส ศัลกรรม Emergency จึงได้เลื่อนไป 20.00น."],[1,24,"S",2,"N","doc","ไม่ส่ง LAN"],[1,24,"O",1,"N","doc","ไม่ส่ง LAN"],[1,24,"O",3,"N","doc","ไม่ส่ง LAN"],[1,25,"S",2,"I","oth","น้ำยาแช่กล้องหมดอายุ"],[1,25,"S",2,"I","inst,ster","พบแมลงอยู่ในถ้วยน้ำยา set เครื่องมือ น้ำยาแช่กล้องหมดอายุ"],[1,25,"G",2,"I","inst,ster","Set รับเด็กไม่มี Sterigate"],[1,26,"S",2,"I","clin","LC เปลี่ยนเป็น OC"],[1,27,"O",1,"I","doc","ไม่ส่ง LAN"],[1,28,"G",3,"I","doc","ไม่ส่งแบบบันทึกก่อนผ่าตัดใน Ichart"],[1,28,"S",2,"I","clin","ส่องกล้องไม่ได้ ผู้ป่วยไม่ให้ความร่วมมือ ดิ้นแรง"],[1,30,"S",1,"N","id,med","ยา Cefazolin ชื่อไม่ตรงกับคนไข้"],[2,1,"O",1,"I","doc","ไม่ Lan"],[2,2,"S",1,"I","doc","ไม่ส่ง LAN"],[2,2,"O",3,"I","doc","ไม่ส่ง LAN"],[2,3,"S",2,"N","doc","ไม่มีใบเซ็นยินยอม"],[2,4,"G",2,"I","env","ประตูห้องผ่าตัด 4 ชำรุด เปิดไม่ได้"],[2,4,"S",2,"N","doc","ไม่มีใบเตรียมผู้ป่วยผ่าตัด"],[2,6,"O",1,"N","doc","ไม่ Lan"],[2,7,"O",2,"N","doc","ไม่ Lan,ไม่มีใบเซ็นยินยอมผ่าตัด"],[2,7,"O",2,"I","doc","ไม่ Lan,ไม่มีใบเซ็นยินยอมผ่าตัด"],[2,8,"O",2,"N","doc","ไม่ Lan"],[2,8,"S",1,"N","clin","first dx. Lipoma at abdominal wall ผ่าตัดพบว่าเป็น abdominal wall hernia คุยกับผู้ป่วย Admit for repair hernia พรุ่งนี้ under GA"],[2,9,"O",1,"I","doc","ไม่ส่ง Lan HosXP"],[2,9,"S",4,"N","id","นำ Chart มาผิดเตียง เลย Tel แจ้ง ศอ ให้นำมาเปลี่ยน"],[2,10,"O",1,"N","inst","Set Major เป็น Set Explor"],[2,10,"O",1,"N","inst,ster","Set ผ้า C-arm ไม่มี Sterigage"],[2,10,"S",2,"N","prep","ไม่ได้ถอดต่างหู , ไม่ถอดนาฬิกา"],[2,12,"O",1,"I","doc","ไม่ส่ง Lan"],[2,12,"S",2,"N","doc,env","โปรแกรม scope ถ่ายรูปติดแต่พอกด report รูปหาย"],[2,12,"S",2,"N","id,clin","1.ไม่มีป้ายข้อมือ 2.SSI แผลมีหนองลึกถึงใต้ชั้นsheath ส่ง PUS c/s"],[2,12,"O",4,"N","med","ไม่มี Cefazolin 2 gm to OR ตาม order"],[2,13,"G",1,"N","id","ป้ายข้อมือเปียกน้ำ จาง อ่านชื่อไม่ได้"],[2,13,"G",2,"N","comm","คนไข้ เชื้อดื้อยา ตึกไม่ได้แจ้งเวรเปล ไม่มีป้ายตัว C แขวนมา"],[2,13,"S",4,"N","id,clin","ตึก O ส่งผู้ป่วยผิดคน ผู้ป่วยมีอาการหอบเหนื่อย อ่อนเพลีย"],[2,13,"S",1,"N","doc,clin","unplan ICU มี aspirate ขณะใส่ ETT"],[2,14,"S",4,"N","doc","ไม่ส่ง LAN"],[2,15,"G",1,"I","env","ห้องผ่าตัดหลัก(ห้อง4)ชำรุด ต้องย้ายไปผ่าตัดห้อง2"],[2,15,"G",1,"I","env","ห้องผ่าตัดหลัก(ห้อง4)ชำรุด ต้องย้ายไปผ่าตัดห้อง2"],[2,15,"G",2,"I","doc,env","ไม่ส่ง LAN , ใบเตรียมผ่าตัด, ห้องผ่าตัดหลัก(ห้อง4)ชำรุด ต้องย้ายไปผ่าตัดห้อง2"],[2,15,"O",1,"I","doc,med","ไม่ส่ง LAN , order Cefazolon 2 gm to OR ได้เป็น Cef-3"],[2,15,"G",2,"I","env","ห้องผ่าตัดหลัก(ห้อง4)ชำรุด ต้องย้ายไปผ่าตัดห้อง2"],[2,16,"O",1,"I","inst,ster","นึ่งเครื่องมือ Nail เครื่องพลาสมาแล้วไม่ผ่าน"],[2,16,"G",2,"I","doc","ไม่ส่ง Lan ผ่าตัด"],[2,16,"S",2,"N","doc","ไม่มีใบเซ็นยินยอมผ่าตัด"],[2,16,"S",2,"N","prep","ไม่ถอดชุดชั้นใน"],[2,17,"S",2,"I","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[2,17,"G",1,"I","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[2,21,"O",3,"N","doc","ไม่มีใบเซ็นต์ยินยอม ผ่าตัด"],[2,21,"O",2,"N","doc","ไม่ส่งแบบบันทึกผู้ป่วยก่อนผ่าตัดใน Ichart"],[2,22,"S",2,"N","id,inst,ster","1.ไม่มีป้ายข้อมือ 2.มีเศษเครื่องมืออยู่ในเซต"],[2,23,"O",1,"I","med,comm","order MO 4 mg TO OR ตึกลืมนำมาด้วย โทรไปตามให้เอามาให้อีกครั้ง ตึกให้ Morphine มา 4 ampule"],[2,23,"O",1,"I","prep,clin","-มีปรอทวัดไข้ติดมาในเสื้อผู้ป่วย - มีปลอกurine bag ติดมากับแพมเพิร์ส (order retain foley วันที่ 22/12/68) · ย้าย ICU"],[2,23,"S",2,"I","clin","คนไข้ไม่ให้ความร่วมมือ"],[2,23,"S",1,"N","id","ไม่มีป้ายข้อมือ"],[2,24,"S",1,"I","id","ไม่มีป้ายข้อเท้า"],[2,26,"O",1,"I","med","ไม่ได้นำยามากับคนไข้ ตาม order"],[2,27,"S",2,"N","doc","ไม่มีใบเตรียมคนไข้ก่อนผ่าตัด"],[2,27,"S",2,"N","doc","ไม่มีใบเซ็นยินยอมการผ่าตัด"],[2,30,"G",2,"I","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด , ไม่ส่งLan"],[2,30,"O",1,"I","doc","ไม่มีใบเซ็นต์ยินยอมผ่าตัด"],[2,31,"S",4,"N","id,ster","ไม่เตรียมความสะอาดก่อนการผ่าตัด, sticker ผิดคน"],[2,31,"S",4,"N","id","IV clot , sticker ผิด Chart"],[2,31,"O",2,"N","doc","ไม่มีใบเซ็นต์ยินยอมก่อนผ่าตัด"],[3,1,"O",2,"N","id","ไม่มีป้ายข้อมือ"],[3,3,"S",3,"N","doc","ไม่มีใบเซ็นต์ยินยอมผ่าตัด"],[3,5,"G",2,"I","clin","tear serosal of anterior aspect of middle rectum --> repair c silk 3-0 * 6"],[3,5,"E",1,"I","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[3,5,"O",2,"I","doc","ไม่ส่ง Lan"],[3,5,"O",2,"N","doc","ไม่ส่ง Lan"],[3,6,"O",1,"I","doc","ไม่ส่ง Lan"],[3,6,"S",2,"I","doc","ไม่ส่ง Lan"],[3,6,"S",4,"I","doc","ไม่ส่ง Lan"],[3,6,"S",3,"I","doc","ไม่ส่ง Lan ไม่มีใบเตรียมผู้ป่วยผ่าตัด"],[3,6,"G",1,"I","doc","ไม่ส่ง Lan"],[3,6,"S",3,"N","inst","Set excision Lot:0501690201 ไม่มีกรรไกรตัดไหม"],[3,6,"O",3,"N","doc","ไม่มีใบเซ็นยินยอมผ่าตัด"],[3,6,"O",3,"N","doc","ไม่มีใบเซ็นยินยอมผ่าตัด"],[3,7,"S",2,"I","inst","Set มาทำ EGD+Colonoscope เปลี่ยนใจที่ OR ทำแค่ Colonoscope"],[3,9,"S",2,"I","clin","ทำ colono เกิดกล้องทะลุ บริเวณ Sigmoid set OR for EL stat"],[3,12,"G",2,"I","inst,ster","ผ้าห่อเซ็ทเสื้อกาวน์ 3 ตัว ไม่มีป้ายวันหีบห่อ+ผ้าขาดเป็นรูขนาด 1*5 ซม."],[3,12,"O",1,"I","doc","ไม่มีใบเตรียมผู้ป่วยผ่าตัด"],[3,12,"S",3,"N","comm","คนไข้เชื้อดื้อยา ตึกไม่ได้แจ้งเวรเปล"],[3,12,"S",3,"N","doc","ไม่ LAN"],[3,12,"S",3,"N","ster,env","น้ำในถังพักน้ำห้องล้างกล้องท่วม เนื่องจากมีตะไคร่น้ำอุดตัน ทำให้น้ำล้น"],[3,13,"S",1,"I","doc,clin","converse to OC active bleeding BP drop , ICU unplan"],[3,13,"S",3,"I","doc,prep","ไม่ LAN มีของมีค่าติดตัวผู้ป่วยมา(แหวนและเสื้อคอกระเช้า)"],[3,13,"G",1,"I","clin","Tear bladder ตาม พ.SX"],[3,13,"O",2,"N","id","ใส่ป้ายชื่อข้างที่ผ่าตัด"],[3,14,"S",1,"I","med,comm","OPD เซ็ทเคสแจ้งประวัติคนไข้แพ้ยา amoxicillin แต่ในใบแพ้ยาคนไข้แพ้ cerecoxib กับ dicloxacillin"],[3,14,"O",3,"I","doc","ไม่LAN,ไม่มีใบเตรียมผ่าตัด"],[3,15,"O",1,"I","doc","ไม่ LAN"],[3,15,"O",1,"I","id","ไม่มีป้ายข้อมือ"],[3,15,"O",2,"N","doc","ไม่ Lan"],[3,16,"S",2,"I","doc","ไม่ Lan"],[3,16,"S",2,"I","doc","ไม่ Lan"],[3,16,"O",1,"I","doc","ไม่ Lan"],[3,16,"O",1,"I","doc,med","ไม่ Lan / amp ยาแตกมาจากตึก เช็กได้ที่ OR ตอนรับคนไข้"],[3,16,"S",2,"I","doc","ไม่ Lan"],[3,18,"O",1,"N","doc,prep,post,comm","ไม่มีใบเซ็นยินยอมในห้องผ่าตัด คนไข้ไม่มีเลือดเนื่องจากการสื่อสารผิดพลาด ทำให้ได้เลื่อนเคสผ่าตัดเป็นเวลา13.30 วอร์ดไม่เปลี่ยนแพมเพิสก่อนมา OR"],[3,21,"S",1,"I","doc,clin","ไม่ Lan , ไม่มีใบเตรียมผ่าตัด , convert OC , CBD"],[3,21,"S",3,"I","med,post,comm","EGD set case จาก OPD แจ้งว่าผู้ป่วยไม่มี U/D จากการซักประวัติที่ OR พบ HT, stroke และโรคเครียด(รับยาจิตเวช) เลื่อน 28/1/69 + lab"],[3,21,"S",2,"N","doc","ไม่ Lan"],[3,23,"G",2,"I","inst","swab ขาด 1 ผืน"],[3,23,"O",1,"I","doc","ไม่LAN"],[3,23,"S",2,"I","doc","ไม่ LAN"],[3,24,"O",4,"N","doc,post","23/1/69 เลื่อนผ่าตัดไปวันที่24/1/69 เนื่องจากตกกระดาน 16.00น. แพทย์ไม่สะดวกทำนอกเวลา ไม่มีใบเซ็นต์ยินยอมผ่าตัดวันที่ 24-1-69"],[3,26,"S",2,"N","doc","ไม่แลนใบประเมินก่อนผ่าตัดใน Ichart"],[3,28,"S",3,"I","id,clin","ไม่มีป้ายข้อมือ, Polyp loss"],[3,28,"O",3,"I","id","ผ่าตัดข้างซ้าย วอร์ดsetข้างขวา"],[3,29,"G",2,"N","prep","ไม่ได้ถอดต่างหูมา OR"],[4,1,"O",3,"N","id","ไม่มีป้ายข้อมือ"],[4,2,"S",4,"N","comm","ผู้ป่วยดื้อยา มีประวัติ Pseudomonas aeruginosa ใน progress note และวิสัญญีโทรแจ้งตึกหลังจาก Set case เวรเปลถามตึกว่าดื้อยาไหม ตึกบอกไม่รู้ เวรเปลจึงไม่ได้ป้องกัน และไม่ได้แขวนป้ายดื้อยา"],[4,3,"O",2,"N","inst","เครื่องมือบริษัทไม่พร้อมใช้งาน ทำให้ต้องเปิดเครื่องมือใหม่ของอีกบริษัท"],[4,3,"-",0,"-","post","เลื่อนเคสไปทำ 09.00 04/02/69 เนื่องจากมีเคส emergency หลายเคส"],[4,4,"S",2,"I","inst","set major ก๊อซเกินมา 1 ชิ้น Lot 0302690203"],[4,5,"S",1,"I","doc","ไม่ได้ส่งแลน"],[4,5,"S",3,"I","doc","ไม่ได้ส่งแลน"],[4,5,"S",3,"I","clin","Polyp loss"],[4,5,"S",3,"I","clin","Polyp loss"],[4,5,"S",2,"I","doc","ไม่ได้ส่งแลน"],[4,7,"S",2,"N","doc,prep","ไม่ถอดฟันปลอม , ไม่ส่ง LAN"],[4,9,"S",2,"N","doc,post","ไม่ส่งแลน · Set OR for C/S 20.00น. แพทย์off case เนื่องจาก fully NL"],[4,9,"S",2,"N","inst","set EL major มี gauze2พับ lot no.0702690102"],[4,9,"G",1,"N","doc","ไม่มีญาติเซ็นยินยอม เนื่องจากมารดาเดินทางมาจากต่างอำเภอ แพทย์พิจารณาผ่าตัดก่อน เพราะมีภาวะฉุกเฉิน"],[4,10,"O",1,"I","post","เลื่อน OR จาก09/02/69 เป็น 10/02/69 เนื่องจากมีเคส emergency หลายเคส"],[4,10,"S",2,"I","post","เลื่อน OR จาก09/02/69 เป็น 10/02/69 เนื่องจากมีเคส emergency หลายเคส"],[4,10,"O",3,"I","post","เลื่อน OR จาก09/02/69 เป็น 10/02/69 เนื่องจากมีเคส emergency หลายเคส"],[4,10,"O",1,"I","id","1.ชื่อคนไข้หน้าชาร์ทผิดคน 2.ไม่มีป้ายข้อมือ"],[4,10,"O",1,"I","doc","ไม่LAN"],[4,10,"S",2,"I","doc","ไม่ LAN"],[4,10,"S",2,"I","doc","ไม่ LAN"],[4,10,"S",2,"N","doc","ไม่ LAN"],[4,10,"S",2,"N","doc,prep","ไม่ได้ถอดเล็บเจล ไม่ส่ง Lan"],[4,11,"G",2,"I","clin","EBL 2000 ml."],[4,11,"O",1,"I","doc","ไม่ Lan /ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[4,12,"S",1,"I","doc","ไม่ส่งแลน"],[4,12,"O",1,"N","inst,clin","เครื่องมือบริษัทมีปัญหา+ปิด cap ไม่ได้ · ย้าย ICU"],[4,12,"S",1,"I","inst,prep,post","set OR for retain foley's catheter At OR pt.void ได้ แพทย์พิจารณา off case at OR"],[4,13,"O",2,"N","inst,post","Set OR for arthrotomy 12/02/69 เลื่อน OR เป็น 13/02/69 เนื่องจากไม่มีวิสัญญีแพทย์อยู่เวรนอกเวลา"],[4,13,"O",2,"I","doc","ไม่มีใบเซ็นต์ยินยอม"],[4,13,"S",2,"N","clin","Tear Bladder"],[4,15,"O",2,"N","doc","ไม่ส่งแลน"],[4,16,"O",3,"N","doc","ไม่ Lan"],[4,16,"G",2,"I","doc","ไม่ Lan"],[4,16,"-",0,"-","clin","case EGD UGIB BP drop อาเจียนเป็นเลือดมากขึ้น Refer at ward"],[4,17,"O",1,"I","doc","ไม่ LAN"],[4,18,"O",1,"I","doc,clin","ไม่ส่ง Lan ไม่มีใบเซ็นยินยอม ไม่มีใบเตรียมคนไข้ก่อนผ่าตัดค่ะ · ย้าย ICU"],[4,18,"O",4,"N","doc,id","1.ไม่ LAN 2.ใส่ป้ายข้อมือข้างที่จะผ่าตัด"],[4,19,"O",4,"N","id,inst,comm","1.ป้ายข้อมือลาง อ่านชื่อระบุตัวบุคคลไม่ได้ 2.ไม่มีป้าย C คนไข้ดื้อยา 3.ตึกไม่ได้แจ้งเวรเปลว่าคนไข้เชื้อดื้อยา 4.แพ็คก๊อซในโพรงแผล 3 ชิ้น ไม่ได้มัดต่อกัน 5.ไม่ได้ติดหน้าชาร์ทว่าแพ็คก๊อซในแผลกี่ชิ้น"],[4,19,"S",4,"I","doc","ไม่LAN"],[4,19,"S",2,"I","clin","หลังผ่าตัด เวียนศีรษะ HR 124 นอนพักดีขึ้น"],[4,19,"S",4,"I","id","ป้ายข้อมือลาง อ่านชื่อระบุตัวบุคคลไม่ได้"],[4,19,"S",2,"I","doc","ไม่มีใบเตรียมผ่าตัด"],[4,19,"S",3,"I","doc","ไม่LAN"],[4,19,"O",1,"I","inst","Revision plate, เครื่องมือไม่พร้อม Plate ไม่ได้ sterile ไว้พร้อมใช้งาน"],[4,19,"O",1,"N","doc","ไม่LAN"],[4,19,"O",1,"N","doc,id","ไม่LAN, ใส่ป้ายข้อมือข้างที่จะผ่าตัด"],[4,20,"O",1,"I","med,comm","วอร์ดให้ยามาเกิน เป็นตัวที่ไม่ได้ใช้ในยาcocktail"],[4,20,"S",2,"N","comm","แพทย์ order set OR appendectomy เวลา NOW แต่ OPD ไม่โทรมาset case และส่งขึ้นไข้ขึ้นตึก"],[4,23,"E",2,"I","ster,env","แอร์ห้องครัว มีน้ำหยด"],[4,23,"E",1,"I","inst","Set explore minor LOT.1302690203 ขาด senn retractor 1 คู่"],[4,23,"S",1,"I","doc","1.ไม่ส่ง Lan 2.ไม่มีใบเตรียมคนไข้ก่อนผ่าตัด"],[4,23,"O",1,"I","doc,med","1.ไม่ส่ง Lan 2.ไม่มีใบเตรียมคนไข้ก่อนผ่าตัด 3.ไม่มี cefa มา OR ตาม order"],[4,24,"S",3,"I","doc,prep","ไม่ส่ง LAN , Pt กินน้ำตอนตี 4 แจ้งว่า ไม่เห็นป้ายงดน้ำงดอาหาร"],[4,24,"S",3,"I","doc","ไม่ส่ง LAN"],[4,24,"S",2,"I","id","ไม่มีป้ายข้อมือ"],[4,24,"O",2,"N","inst","artery clamp ชำรุด 4 ตัว"],[4,25,"-",0,"-","clin,post","Off case แพทย์จะ refer"],[4,26,"Y",1,"I","id","ติดป้ายเป็นข้างขวา"],[5,1,"S",2,"N","env","เครื่องปั้มน้ำ ERROR"],[5,1,"-",0,"-","post","Off case at OR ผู้ป่วยถ่ายได้แล้ว"],[5,1,"S",2,"N","doc","ไม่มีใบเตรียมผ่าตัด"],[5,2,"O",4,"I","doc","1.ไม่ส่ง LAN, 2.ไม่มีใบเตรียมผ่าตัด, 3.ไม่มีใบเซ็นยินยอม"],[5,2,"O",3,"I","doc","ไม่ส่ง LAN,ไม่มีใบเตรียมผ่าตัด"],[5,3,"O",1,"N","inst,prep,post","Set OR 2/2/69 ผู้ป่วยกินข้าว เลื่อนเป็น 3/3/69"],[5,3,"S",4,"N","doc","ไม่มีใบยินยอมผ่าตัด"],[5,4,"O",2,"N","id","ใส่ป้ายข้อมือมาข้างซ้าย ข้างที่ผ่าตัด"],[5,5,"O",1,"I","post","เลื่อนจาก 4 มีนาคม 69 รอวิสัญญีแพทย์"],[5,5,"S",3,"I","post","เคส colonoscopy under TIVA Pt. ขึ้นเชื้อ Herpes zoster วันที่ 28/2/69 วิสัญญีแพทย์พิจารณา off case รอ 2 wk ศัลยแพทย์เปลี่ยนเป็นทำ under LA"],[5,6,"S",2,"I","inst","เครื่องมือไม่ครบ ขาด Clamp โค้ง 1 ตัว Lot.0503690203"],[5,6,"O",2,"I","doc,inst","ไม่ Lan Gauze เกิน 1 พับ"],[5,7,"S",3,"N","clin","Tear bowel"],[5,7,"S",3,"N","clin","RR"],[5,9,"O",2,"I","id","ใส่ป้ายชื่อข้างที่ผ่าตัด"],[5,11,"O",4,"I","doc","ไม่มีใบยินยอมผ่าตัด"],[5,11,"O",2,"N","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[5,12,"S",1,"I","doc","ไม่ส่ง LAN"],[5,16,"O",1,"I","doc","ไม่LAN"],[5,16,"G",2,"I","med","ไม่ได้ฉีด ATB ก่อนมา OR ตาม order แพทย์"],[5,16,"O",1,"I","doc","ไม่LAN"],[5,16,"O",1,"N","doc","ไม่LAN"],[5,16,"G",1,"I","doc","ไม่มี I-chart"],[5,16,"S",3,"I","doc,clin","1.ไม่LAN 2.ไม่มีใบเตรียมผ่าตัด 3. 14.40น.แรกรับที OR ผู้ป่วยเหงื่ออกตัวเย็น เวียนศีรษะ เป็น DM เจาะ DTX ได้ 52 mg% ไม่มีใบเตรียมผู้ป่วย จึงไม่มีรายละเอียด V/S ก่อนมา OR"],[5,17,"G",1,"I","prep","มียางรัดผม, สายสิญจน์มากับคนไข้"],[5,17,"O",1,"I","id","ใส่ป้ายข้อมือข้างที่ผ่าตัด"],[5,17,"O",1,"I","inst,med","Set major มี sponge holder 5 ตัว Lot No.1603090203 แพทย์order Vancomycin 2 gm to OR วอร์ดจ่ายมา 500mg."],[5,17,"O",1,"N","oth","ไม่ระบุรายละเอียด"],[5,17,"S",2,"N","inst","Set explor major Lot No.1103090203 ไม่มี tonsil แพ็คเครื่องมือผิดใส่เป็น right angle มา"],[5,17,"O",2,"N","doc","ไม่ได้ Lan มา"],[5,17,"O",3,"N","doc","ไม่ส่งแลน"],[5,18,"S",0,"-","post","OFF case at ward เนื่องจากผู้ป่วยตัวเหลือง"],[5,18,"S",0,"-","post","Fail EGD"],[5,18,"O",3,"N","doc,clin","ย้าย ICU unplan"],[5,19,"S",0,"-","post","Off case at OR เนื่องจากผู้ป่วยไอเยอะ"],[5,21,"S",1,"N","doc,env,comm","ไม่แขวนป้ายดื้อยา และ ไม่แจ้งเวรเปล , I-chart ERROR"],[5,21,"O",1,"N","doc,env","ไม่ส่งLAN , I-chart ERROR"],[5,23,"S",2,"I","inst","เครื่องมือใน Set major มี Mezenbaum เกิน 2ตัว"],[5,24,"S",4,"I","doc","ไม่มีแบบบันทึกประเมินผู้ป่วยก่อนผ่าตัด"],[5,24,"S",2,"I","doc","ไม่ส่ง LAN"],[5,24,"S",2,"N","doc","ไม่ส่ง LAN"],[5,25,"O",1,"I","id","แนบ sticker มาผิดคน"],[5,25,"O",2,"N","doc","ไม่ส่ง LAN"],[5,26,"S",1,"I","doc","ไม่ส่ง LAN"],[5,29,"O",2,"N","doc","ไม่ส่ง Lan"],[5,30,"S",4,"I","doc","ไม่มีใบเซ็นต์ยินยอมผ่าตัด, ไม่ส่งแลน"],[5,30,"O",1,"I","med","Ward ไม่ได้เอา ATB มาด้วย"],[5,30,"G",2,"N","clin","EBL 1400 ml tear vessel"],[5,30,"O",2,"N","prep","ไม่ได้เปลี่ยนเสื้อผ้า"],[6,2,"S",2,"N","clin","intra op fecal content เยอะ ออกมาโดนแผลตอน mature ostomy"],[6,3,"-",0,"-","med,post","SB แล้ว แพทย์พิจารณาเลื่อนเคสผ่าตัดไปสัปดาห์หน้าเนื่องจากมีความซับซ้อนจากพยาธิสภาพของโรค"],[6,3,"O",1,"N","doc","ไม่ส่ง LAN"],[6,3,"-",0,"-","post","เลื่อนเคสไปทำวันจันทร์"],[6,6,"O",4,"N","env","แอร์เสีย เนื่องจากไฟตก"],[6,6,"S",2,"N","clin","ขณะ EGD มี bleed และไม่สามารถ remove FB ได้ แพทย์พิจารณา refer เนื่องจาก ไม่มีอุปกรณ์"],[6,7,"S",2,"N","doc","ไม่มีใบเซ็นยินยอมผ่าตัด"],[6,7,"S",2,"N","doc","ไม่ส่ง LAN"],[6,8,"-",0,"-","post","เลื่อนผ่าตัดไปทำพรุ่งนี้ 9 เมย 69 เนื่องจากเป็น case elective ตกกระดาน"],[6,10,"O",1,"I","doc","ไม่มีใบเซ็นต์ยินยอมผ่าตัด"],[6,14,"-",0,"-","clin,post","Off case เนื่องจากคนไข้หอบเหนื่อย มีอาการชักเกร็ง"],[6,14,"S",2,"N","doc","ไม่มีใบเตรียมผ่าตัด ไม่มีใบเซ็นยินยอม ไม่ได้ส่งแลน"],[6,14,"S",2,"N","doc","ไม่มีใบเตรียมผ่าตัด ไม่มีใบเซ็นยินยอม ไม่ได้ส่งแลน (แรกรับ BP 103/31 ต่อมา 80/40 รายงานแพทย์ load acetar 300cc ขณะ EGD BP 90/40)"],[6,17,"G",2,"I","clin","ไม่เจอ Rt. fimbria"],[6,17,"-",0,"-","clin,post","HR 120/min EKG sinus tachycardia แพทย์เลื่อน OR ไปก่อน"],[6,20,"-",0,"-","post","Off Case เนื่องจากผู้ป่วยขอเลื่อนการผ่าตัด เพราะไม่พร้อมรับการผ่าตัด"],[6,21,"S",1,"I","inst,clin","มี Polyp แต่ไม่มีเครื่องมือ จึงไม่ได้ตัด"],[6,21,"S",2,"I","doc","ไม่ Lan/ ไม่มีใบประเมินผู้ป่วยผ่าตัด"],[6,21,"S",2,"I","doc","ไม่ Lan"],[6,21,"O",1,"I","doc","ไม่ Lan / ไม่มีใบประเมินผู้ป่วยผ่าตัด"],[6,21,"O",1,"I","doc","ไม่ Lan / ไม่มีใบประเมินผู้ป่วยผ่าตัด"],[6,21,"S",2,"N","doc","ไม่ Lan"],[6,22,"O",1,"I","clin","ขึ้น tourniquet นาน 2 ชม."],[6,23,"S",2,"I","doc","ไม่มีใบเซ็นต์ยินยอมผ่าตัด"],[6,24,"O",1,"I","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[6,27,"G",2,"I","doc","ไม่ได้ส่งแลน"],[6,27,"S",2,"I","doc","ไม่มีใบเซ็นต์ยินยอมผ่าตัด"],[6,27,"S",2,"I","med,clin,comm","เคสจากบ้านเหลื่อม โทร Consult ศัลยแพทย์ รับ Refer แล้ว ให้ผู้ป่วยถือใบ Refer เดินทางมาเอง ไม่ได้ให้สารน้ำ และไม่ได้ส่งใบ Refer ในกลุ่ม Refer"],[6,29,"-",0,"-","post","Off case EGD ปวดหัวมาก"],[6,29,"-",0,"-","post","off case colono เป็นงูสวัส"],[6,29,"O",1,"I","staff","k-wire ทิ่มมือแพทย์"],[6,29,"S",1,"I","doc,inst","ไม่ส่งLAN,Set EL major ไม่มี non-tooth forcep /มี tissue forceps ในเซต"],[6,29,"S",3,"I","clin","หอบเหนื่อย"],[6,29,"S",3,"N","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[6,29,"S",3,"N","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[7,5,"S",2,"N","med,post","เลื่อนเคสไปพรุ่งนี้ เนื่องจากคนไข้อยากบล็อกหลัง"],[7,5,"S",2,"I","doc","ไม่ Lan"],[7,5,"S",2,"I","doc","ไม่ Lan"],[7,5,"S",4,"N","doc","ไม่ Lan"],[7,5,"S",4,"N","doc","ไม่ Lan"],[7,5,"O",2,"N","doc","ไม่ Lan"],[7,5,"S",4,"N","doc","ไม่ Lan , ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[7,5,"O",2,"N","doc","ไม่ Lan"],[7,6,"O",1,"I","doc,env","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด ,ห้องผ่าตัด1 ชำรุด ระบบปรับอากาศไม่ทำงาน ทำให้ต้องย้ายห้องไปห้องผ่าตัด2"],[7,8,"-",0,"-","post","off case ORIF LCP distal radius ผู้ป่วยปฏิเสธ"],[7,8,"S",2,"N","prep","ไม่ถอดกางเกงใน"],[7,11,"O",1,"I","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[7,11,"S",1,"I","staff","เลือดกระเด็นเข้าตาแพทย์"],[7,15,"S",3,"I","doc","ไม่มีใบเซ็นยินยอมในห้องผ่าตัด"],[7,18,"S",0,"-","post","off case ไม่มีเลือด"],[7,19,"S",1,"I","doc,id","ส่ง LAN ผิดคน"],[7,19,"O",3,"N","med,comm","ไม่มี Cefa 2 g to OR , เคสเชื้อดื้อยาไม่มีป้ายแขวนมา"],[7,19,"S",0,"-","post","OFF case at OR BP สูง"],[7,19,"O",1,"N","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[7,21,"S",2,"I","med","ไม่มีน้ำเกลือ หมอออเดอร์ Admit OPD ไม่ได้ทำ"],[7,26,"-",0,"-","post","เลื่อนผ่าตัด ไป 27/05/69"],[7,26,"O",1,"I","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด / เสริมเวร"],[7,26,"-",0,"-","inst,post","เลื่อนผ่าตัด เครื่องมือไม่พร้อม"],[7,27,"-",0,"-","inst,env,post","OFF case at ward เนื่องจากเครื่องมือพัง (FLU)"],[7,28,"O",0,"-","post","Off case เนื่องจากถุงน้ำยุบแล้ว"],[7,28,"S",1,"I","inst","ข้างในเป็น Set major แต่ติดป้าย Set Explore major"],[7,28,"O",1,"I","inst","Set ผ้า Major ไม่มีเจาะกลาง"],[7,28,"O",0,"-","post","เลื่อนผ่าตัด"],[7,31,"S",3,"N","doc","ไม่มีใบเซ็นยินยอมผ่าตัด"],[8,1,"O",2,"N","id","ใส่ป้ายชื่อข้างที่ผ่าตัด"],[8,4,"S",2,"I","inst,ster","สาย Suction สกปรก"],[8,4,"S",2,"I","doc","ไม่ Lan ไม่ทำแบบบันทึกผู้ป่วยก่อนผ่าตัด"],[8,5,"G",2,"I","prep","ไม่ได้ถอดชุดชั้นใน"],[8,5,"-",0,"-","post","OFF case at ward คนไข้จิตเวช"],[8,8,"S",2,"I","inst","Set Syringe Irrigate แตกจากใน set"],[8,9,"-",0,"-","post","เลื่อนผ่าตัด จาก 9/6 เป็น 10/6"],[8,11,"-",0,"-","post","เลื่อน case at ward 12/06/69 เวลา 15.00 น."],[8,13,"S",0,"-","post","Off case BP สูง"],[8,13,"S",0,"-","post","Off case BP สูง"],[8,14,"S",3,"N","prep","ไม่ถอดเสื้อชั้นใน"],[8,14,"S",0,"-","post","OFF case BP สูง"],[8,14,"S",3,"N","clin","loss specimen"],[8,15,"S",2,"N","prep,med","มี Order Retain NG / Foley ก่อนมา OR ไม่ได้ทำมา และ ATB to OR ก็ไม่ได้เอามาให้ ได้โทรตามเอามาให้"],[8,16,"G",1,"I","doc","ไม่ส่ง LAN ไม่มีใบเตรียมผ่าตัด"],[8,16,"S",0,"-","id,comm","OPD ส่งผู้ป่วยมาผิดคน/EGD ปฏิเสธการรักษา"],[8,17,"G",2,"I","clin","EBL: 1000 Uterine atony ทำ B-Lynch"],[8,17,"O",2,"N","comm","เคสคดีไม่ใส่กุญแจมือมา รปภ.นำส่ง 2 นาย ไม่มีตำรวจมาด้วย"],[8,18,"S",2,"I","doc","ไม่ LAN"],[8,21,"S",2,"N","env","แอร์ทางเดิน ERROR , แอร์ห้องเก็บของ sterile ไม่ทำงาน"],[8,21,"S",2,"N","env","แอร์ทางเดิน ERROR"],[8,22,"O",3,"I","inst","Set excision Lot : 1706690203 ไม่มี Allis 2 ตัว"],[8,22,"G",1,"I","id","ไม่สามารถ ระบุ ข้าง Ovarian cyst ได้"],[8,23,"S",1,"I","oth","ไม่ระบุรายละเอียด"],[8,26,"S",2,"I","doc","ใบ Colono รูปไม่ขึ้น"],[8,27,"O",2,"N","doc","ไม่มีใบเซ็นยินยอม"],[8,28,"S",3,"N","prep","Pt แอบกินน้ำเลยให้เป็นคิวสุดท้าย"],[8,29,"G",2,"I","doc","ไม่แลน ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[8,30,"S",2,"I","prep","คนไข้ไม่ล้างเล็บเจลทั้งมือและเท้า"],[8,30,"O",1,"I","inst,ster","set ผ้า excision ortho ไม่ผ่านการ sterile"],[8,30,"S",1,"I","ster","เสื้อกราวน์ sterile มีสติ๊กเกอร์ติด"],[8,30,"O",2,"N","prep","มีจิวลิ้นไม่ได้ถอดออกก่อนมาผ่าตัด"],[8,30,"O",2,"N","id","ไม่มีป้ายข้อมือ"],[8,30,"S",2,"N","doc,post","ไม่แลนผ่าตัด Off case BP 201/87 mmHG P= 88 bpm"],[8,30,"S",2,"N","prep","ไม่ถอดเครื่องประดับ,สร้อยพระ"],[8,30,"S",2,"N","doc","ไม่ส่งใบประเมินก่อนผ่าตัดใน Ichart"],[8,30,"O",2,"N","doc","ไม่ส่งใบประเมินก่อนผ่าตัดใน Ichart"],[9,1,"G",1,"I","inst,env","Set C/S --Sponge holder และ Khocker ชำรุด เตรียมเครื่องมือรอเกือบ 1 ชม. 09.00น. ผ่าตัดเวลา09.59น. เปิดแอร์27องศา"],[9,1,"S",2,"N","comm","ตึกตามผู้ป่วยเวลา 20.45 น. ตึกตามช้าโทรซ้ำรอบสอง ผู้ป่วยมาถึงเวลา 21.20 น."],[9,2,"O",0,"-","post","เลื่อนไปทำวันถัดไป"],[9,2,"S",3,"I","doc","ไม่แลนผ่าตัด"],[9,3,"S",2,"I","doc","ไม่มีใบยินยอมผ่าตัด"],[9,4,"O",2,"N","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[9,4,"O",1,"N","prep","ไม่ถอดต่างหู"],[9,5,"O",3,"N","inst","Set excision Lot.0107690402 ขาดด้ามมีด 2 อัน"],[9,7,"O",1,"I","inst,ster","มีเศษ bone ในเครื่องมือบริษัท"],[9,7,"S",2,"N","id","ไม่มีป้ายข้อมือ"],[9,8,"O",2,"N","clin","เปลี่ยนจาก LA เป็นBB เนื่องจากมือผู้ป่วยบวมมาก"],[9,9,"O",1,"I","doc","ไม่มีใบเซนต์ยินยอมในห้องผ่าตัด"],[9,10,"O",1,"I","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[9,10,"O",1,"N","env","น้ำไม่ไหล , เครื่องรัดห้ามเลือดหน้าจอผิดปกติ"],[9,11,"S",2,"N","doc","ไม่ส่ง LAN , ใบรับ Set case HN ไม่ถูกต้อง"],[9,11,"S",3,"N","clin","Duodenum Injury"],[9,15,"O",1,"N","doc,clin","ไม่ส่ง LAN , Failed reduction"],[9,21,"O",1,"I","doc","ไม่ LAN ผ่าตัด"],[9,21,"S",2,"I","doc","ไม่ LAN ผ่าตัด"],[9,21,"S",3,"N","doc","ไม่ LAN ผ่าตัด"],[9,21,"S",2,"N","doc","ไม่มีใบเซ็นยินยอมในห้องผ่าตัด"],[9,22,"O",1,"I","env,staff","ปลั๊กไฟพื้นระเบิด"],[9,22,"S",2,"N","doc","ไม่มีใบเซ็นยินยอมในห้องผ่าตัด"],[9,23,"O",1,"I","inst","เครื่องมือบริษัทไม่พร้อมผ่าตัด"],[9,23,"S",1,"I","clin","subcutaneous emphysema"],[9,24,"O",1,"I","inst,ster","Set ผ้า Major ไม่ผ่านการ Sterile ตรวจสอบได้ก่อนการใช้งาน"],[9,24,"O",1,"I","doc","ไม่ Lan"],[9,24,"O",1,"I","doc","ไม่ Lan"],[9,29,"S",2,"N","med,env","โคมไฟห้อง2เสีย หลังดมยาสลบแล้ว ตามช่าง 15.00 น. ช่างมา 15.10 น."],[9,31,"S",2,"I","doc","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด"],[9,31,"O",2,"I","clin","เปลี่ยน operation EF >> LCP"],[10,3,"M",1,"I","inst","Set Excision ไม่ครบ"],[10,4,"O",1,"I","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[10,4,"S",2,"N","inst,ster","เซตกะละมัง+เสื้อกราวน์กันน้ำไม่มี sterigate"],[10,5,"S",1,"I","doc","ไม่ส่ง LAN"],[10,5,"O",1,"N","doc","ไม่ส่ง LAN"],[10,6,"S",2,"I","ster","mesh graft อบแก๊ส 5/8/69 supply ส่งขึ้นมา 6/8/69"],[10,6,"O",2,"N","ster","มีหนอนประมาณ 20 ตัว"],[10,7,"S",4,"I","ster","ไม่มี Sterigage"],[10,7,"S",3,"I","id,ster,med","ติด Chart แพ้ยาชื่อคนไข้อีกคนมา และไม่มี Sterigage"],[10,7,"S",3,"N","ster","มีแมลงในห้องผ่าตัด 2"],[10,7,"S",2,"N","ster","มีแมลงในห้องผ่าตัด 2"],[10,8,"S",2,"N","clin","loss specimen"],[10,9,"S",2,"N","clin","loss specimen"],[10,9,"S",2,"N","doc","เวชระเบียนผิด คนไข้เป็นนาง"],[10,9,"S",0,"-","post","Off case HR เร็ว"],[10,9,"S",0,"-","prep,post","OFF case กินข้าวต้ม"],[10,9,"S",0,"-","prep,post","Off case กินโจ๊ก"],[10,9,"S",0,"-","med,post","Off case Admit observe ผื่นหลังให้ยา"],[10,9,"S",0,"-","prep,post","off case กินข้าวต้ม"],[10,10,"G",1,"I","doc","ไม่มีใบเซ็นยินยอม"],[10,10,"S",0,"-","post","เลื่อนผ่าตัด เนื่องจาก BP สูง"],[10,10,"-",0,"-","post","เลื่อนผ่าตัด"],[10,11,"O",1,"I","med","ยา Ketorolac เกินมา 1 amp Order สั่ง 1 Amp จ่ายยามา 2 amp"],[10,11,"S",1,"N","oth","ไม่ระบุรายละเอียด"],[10,17,"S",3,"N","prep","ไม่ได้ถอดสร้อยข้อมือ และต่างหูก่อนมา OR"],[10,17,"S",3,"N","prep","ไม่ได้ถอดสร้อยคอก่อนมา OR"],[10,19,"G",2,"I","doc,inst,ster","ไม่มีใบประเมินผู้ป่วยก่อนผ่าตัด Set scrub OR ไม่มี Sterigage"],[10,19,"S",2,"I","inst,comm","ตามเวรเปลนอก 12.20 ผู้ป่วยมาถึง 13.05 น. แพทย์ Set เวล 13.00 น."],[10,19,"S",4,"N","doc","ไม่มีแบบประเมินก่อนผ่าตัด"],[10,19,"S",2,"N","doc","ไม่ Lan"],[10,19,"O",2,"N","doc","ไม่ Lan"],[10,20,"S",3,"I","inst,ster","set scrub lot 1808690202 = 2 set ไม่มี Sterigage"],[10,21,"O",1,"I","id,med","ไม่มีป้ายข้อมือ ยาไม่ครบ"],[10,23,"O",2,"N","id","ใส่ป้ายข้อมือข้างเดียวกับข้างที่ผ่าตัด"],[10,23,"O",2,"N","id","ใส่ป้ายข้อมือข้างเดียวกับข้างที่ผ่าตัด"],[10,23,"S",0,"-","post","Off case ผู้ป่วยเหนื่อยมากขึ้น"],[10,26,"S",2,"I","doc","ไม่ LAN"],[10,27,"O",2,"I","comm","คนไข้ ผล HIV ขึ้น reactive 2 ครั้ง มาจาก รพช. ไม่ได้รับการแจ้งจาก ER"],[10,28,"G",2,"I","inst","Set C/S 2108690402 ไม่มี richardson"],[10,28,"O",1,"N","doc,inst,ster","ไม่มีใบเตรียมคนไข้ก่อนผ่าตัด Set Major มีเศษคราบสีดำติดอยู่ในเซต"],[11,1,"O",1,"I","doc","ไม่มีใบเตรียมผ่าตัด/OR ไม่ลงเวลารับผู้ป่วย"],[11,1,"O",1,"I","id","ไม่มีป้ายข้อมือ"],[11,1,"S",2,"I","doc","ไม่ Lan ผ่าตัด"],[11,2,"S",2,"I","staff","เลือดกระเด็นเข้าตาแพทย์"],[11,2,"O",4,"I","med,clin","หลังผ่าตัดปวดมากขึ้น consult แพทย์วิสัญญี ให้ยาเพิ่ม"],[11,4,"O",2,"I","oth","ไม่ระบุรายละเอียด"],[11,7,"S",2,"N","doc","ไม่มีใบเตรียมผ่าตัด"],[11,8,"S",1,"I","prep,clin","aspirate ขณะผ่าตัด NPO 9.00น."],[11,8,"S",2,"I","doc","1.ไม่LAN 2.ไม่มีใบเซ็นยินยอม 3.ไม่มีใบเตรียมผ่าตัด"],[11,10,"G",1,"I","inst,ster","Set กะละมัง มีคราบเปื้อน"],[11,14,"G",2,"I","med","หลัง LR ให้ Cefa มีผื่นขึ้นที่หน้า"],[11,14,"G",2,"I","inst","Set Basic ไม่มี Mayo"],[11,14,"G",2,"I","inst,ster","มีหยดน้ำ ใน Set เครื่องมือ"],[11,15,"G",2,"N","inst","Set C/S ไม่มี Richardson เครื่องที่4รอบ2"],[11,15,"-",0,"-","post","OFF Case เนื่องจากคนไข้ A1C 17 ASA3"],[11,15,"-",0,"-","post","OFF Case เนื่องจากคนไข้น้ำตาลสูง DTX413 ASA 3"],[11,15,"S",2,"I","env","ปั๊มลมห้องล้างไม่ทำงาน"],[11,15,"S",2,"I","doc","ไม่มีรูปในใบ EGD"],[11,15,"G",2,"N","doc,inst","1. ไม่ LAN 2. Set C/S ไม่มี กรรไกรตัดไหม"],[11,16,"S",2,"N","clin","คนไข้ผ่า Appendectomy แขวนป้ายรถเข็นคนไข้ที่ OR เป็น ORIF PAS"],[11,18,"S",4,"N","doc","ไม่มีแบบประเมินผู้ป่วยก่อนผ่าตัด"],[11,21,"Y",1,"I","doc,id","Lan ผิดวัน ไปวันที่ 20/09/69"],[11,22,"O",1,"I","clin","case TKA EBL 500ml เก้ไม่เวิร์ก ลองพันใหม่อีกครั้งขึ้นซ้ำ3รอบ เหมือนเดิมเพิ่ม pressure 400"],[11,23,"S",3,"N","doc","ไม่lan"],[11,24,"S",2,"I","doc,clin","Item EGD มีเลือดออกในกระเพาะอาหาร plan EL stat"],[11,28,"M",3,"I","doc","ไม่ส่งLAN"],[11,28,"O",0,"-","post","Off case"],[11,28,"S",0,"-","post","OFF case EGD ผู้ป่วยรอนาน ตกกระดานนาน"],[11,29,"G",2,"N","inst","ไม่มี Richardson Lot.1809690403"],[11,29,"O",1,"I","prep","ไม่ถอดต่างหูก่อนมา OR"],[11,30,"O",1,"I","doc","ไม่มีใบเซ็นยินยอมนอน รพ. ใบเซ็นยินยอมผ่าตัด Block หลังที่ RR ตอน Sign in ไม่ได้ทำการตรวจสอบ พบอีกทีตอนผ่าตัดเสร็จ"]];
+
+const MONTHS=['ต.ค.','พ.ย.','ธ.ค.','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.'];
+const MFULL=['ตุลาคม','พฤศจิกายน','ธันวาคม','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน'];
+const fmt=n=>n.toLocaleString('en-US');
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+DEPTS.forEach(d=>{d.ops.forEach(o=>o.t=sum(o.v));d.ops=d.ops.filter(o=>o.t>0);d.m=Array(12).fill(0);d.ops.forEach(o=>o.v.forEach((x,i)=>d.m[i]+=x));d.t=sum(d.m);});
+const GT=sum(DEPTS.map(d=>d.t));
+const MT=MONTHS.map((_,i)=>sum(DEPTS.map(d=>d.m[i])));
+const col=d=>`var(--c-${d.id})`;
+const peak=MT.indexOf(Math.max(...MT));
+const topDept=[...DEPTS].sort((a,b)=>b.t-a.t)[0];
+const allOps=DEPTS.flatMap(d=>d.ops.map(o=>({...o,d})));
+const topOp=[...allOps].sort((a,b)=>b.t-a.t)[0];
+
+$('kpis').innerHTML=[
+ ['main','ยอดผ่าตัดทั้งปีงบประมาณ',fmt(GT),'ราย จาก '+DEPTS.length+' แผนก'],
+ ['','เฉลี่ยต่อเดือน',fmt(Math.round(GT/12)),'ราย'],
+ ['','เดือนที่ผ่าตัดมากที่สุด',MFULL[peak],fmt(MT[peak])+' ราย'],
+ ['','แผนกที่ผ่าตัดมากที่สุด',topDept.name,fmt(topDept.t)+' ราย · '+(topDept.t/GT*100).toFixed(1)+'%'],
+ ['','หัตถการที่ทำมากที่สุด',topOp.n,fmt(topOp.t)+' ราย · '+topOp.d.name]
+].map(k=>`<div class="kpi ${k[0]}"><span class="l">${k[1]}</span><span class="v" ${k[2].length>12?'style="font-size:20px;line-height:1.4"':''}>${k[2]}</span><span class="s">${k[3]}</span></div>`).join('');
+
+$('legend').innerHTML=DEPTS.map(d=>`<span><i class="sw" style="background:${col(d)}"></i>${d.name}</span>`).join('');
+
+/* stacked chart */
+(function(){
+ const W=720,H=300,L=40,R=8,T=22,B=30;
+ const svg=$('chart');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+ const maxV=Math.ceil(Math.max(...MT)/100)*100;
+ const y=v=>T+(H-T-B)*(1-v/maxV);
+ const bw=(W-L-R)/12;
+ let s='';
+ for(let v=0;v<=maxV;v+=100){s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;}
+ MONTHS.forEach((m,i)=>{
+  const x=L+i*bw+bw*.16,w=bw*.68;let acc=0;
+  s+=`<g class="bar" data-i="${i}" tabindex="0" role="button" aria-label="${MFULL[i]} ${MT[i]} ราย">`;
+  s+=`<rect x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" style="fill:transparent"/>`;
+  DEPTS.forEach(d=>{const v=d.m[i];if(!v)return;const y1=y(acc+v),y0=y(acc);acc+=v;s+=`<rect x="${x}" y="${y1}" width="${w}" height="${Math.max(y0-y1,0)}" style="fill:${col(d)}"><title>${d.name} ${v}</title></rect>`;});
+  s+=`<text class="val" x="${x+w/2}" y="${y(MT[i])-5}" text-anchor="middle">${MT[i]}</text>`;
+  s+=`<text x="${x+w/2}" y="${H-10}" text-anchor="middle">${m}</text></g>`;
+ });
+ svg.innerHTML=s;
+ const sel=i=>{
+  svg.querySelectorAll('.bar').forEach(g=>g.style.opacity=(+g.dataset.i===i)?1:.55);
+  $('detail').innerHTML=`<b>${MFULL[i]} ${i<3?'2568':'2569'} · ${fmt(MT[i])} ราย</b>`+DEPTS.filter(d=>d.m[i]).sort((a,b)=>b.m[i]-a.m[i]).map(d=>`<span class="chip"><i class="sw" style="background:${col(d)}"></i>${d.name} ${fmt(d.m[i])}</span>`).join('');
+ };
+ svg.querySelectorAll('.bar').forEach(g=>{const i=+g.dataset.i;g.addEventListener('mouseenter',()=>sel(i));g.addEventListener('click',()=>sel(i));g.addEventListener('focus',()=>sel(i));});
+ sel(peak);
+})();
+
+/* department rows */
+$('depts').innerHTML=[...DEPTS].sort((a,b)=>b.t-a.t).map(d=>{
+ const pk=d.m.indexOf(Math.max(...d.m));
+ return `<div class="deptrow"><div class="dn"><i class="sw" style="background:${col(d)}"></i><span>${d.name}</span></div>
+ <div class="dbar"><div class="track"><i style="width:${(d.t/GT*100).toFixed(2)}%;background:${col(d)}"></i></div><div class="dnum">${fmt(d.t)} ราย <small>${(d.t/GT*100).toFixed(1)}% · สูงสุด ${MONTHS[pk]} ${d.m[pk]}</small></div></div></div>`;
+}).join('');
+
+/* heat table */
+function shade(v,max){return v>0?`style="background:color-mix(in srgb,var(--accent) ${Math.round(v/max*46)}%,transparent)"`:'';}
+$('heat').innerHTML=`<thead><tr><th>แผนก</th>${MONTHS.map(m=>`<th>${m}</th>`).join('')}<th>รวม</th></tr></thead><tbody>`+
+ DEPTS.map(d=>{const mx=Math.max(...d.m);return `<tr><td><i class="sw" style="background:${col(d)};margin-right:8px"></i>${d.name}</td>${d.m.map(v=>v?`<td ${shade(v,mx)}>${fmt(v)}</td>`:`<td class="zero">–</td>`).join('')}<td class="tot">${fmt(d.t)}</td></tr>`}).join('')+
+ `</tbody><tfoot><tr><td>รวมทุกแผนก</td>${MT.map(v=>`<td>${fmt(v)}</td>`).join('')}<td>${fmt(GT)}</td></tr></tfoot>`;
+
+/* explorer */
+let cur=DEPTS[0].id;
+$('tabs').innerHTML=DEPTS.map(d=>`<button class="tab" type="button" data-id="${d.id}" aria-pressed="${d.id===cur}">${d.name} <span style="opacity:.75">${fmt(d.t)}</span></button>`).join('');
+function renderOps(){
+ const d=DEPTS.find(x=>x.id===cur);const q=$('q').value.trim().toLowerCase();
+ const rows=d.ops.filter(o=>!q||o.n.toLowerCase().includes(q)).sort((a,b)=>b.t-a.t||a.n.localeCompare(b.n));
+ const mx=Math.max(1,...rows.flatMap(o=>o.v));
+ $('opsnote').textContent=`${d.name}: ${d.ops.length} รายการที่มียอด · รวม ${fmt(d.t)} ราย`;
+ $('ops').innerHTML=`<thead><tr><th>Operation</th>${MONTHS.map(m=>`<th>${m}</th>`).join('')}<th>รวม</th></tr></thead><tbody>`+
+  (rows.length?rows.map(o=>`<tr><td title="${o.n}">${o.n}</td>${o.v.map(v=>v?`<td ${shade(v,mx)}>${fmt(v)}</td>`:`<td class="zero">–</td>`).join('')}<td class="tot">${fmt(o.t)}</td></tr>`).join(''):`<tr><td colspan="14" style="text-align:center;color:var(--muted)">ไม่พบรายการที่ค้นหา</td></tr>`)+
+  `</tbody><tfoot><tr><td>รวม${q?' (ที่แสดง)':''}</td>${MONTHS.map((_,i)=>`<td>${fmt(sum(rows.map(o=>o.v[i])))}</td>`).join('')}<td>${fmt(sum(rows.map(o=>o.t)))}</td></tr></tfoot>`;
+}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cur=b.dataset.id;$('tabs').querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed',x===b));renderOps();});
+$('q').addEventListener('input',renderOps);
+renderOps();
+
+/* top ops */
+const topList=[...allOps].sort((a,b)=>b.t-a.t).slice(0,12);
+$("top").innerHTML=topList.map(o=>`<span class="nm" title="${o.n}">${o.n} <em>${o.d.name}</em></span><span class="tk"><i style="width:${(o.t/topList[0].t*100).toFixed(1)}%;background:${col(o.d)}"></i></span><span class="n">${fmt(o.t)}</span>`).join('');
+
+/* summary-sheet splits */
+function prop(title,items){
+ const t=sum(items.map(x=>x[1]));
+ return `<div><div style="font-weight:500;margin-bottom:6px">${title}</div><div class="prop">${items.map((x,i)=>`<i title="${x[0]} ${x[1]}" style="width:${x[1]/t*100}%;background:${x[2]}"></i>`).join('')}</div><div class="prop-l" style="margin-top:6px">${items.map(x=>`<span><i class="sw" style="background:${x[2]};margin-right:5px"></i>${x[0]} ${fmt(x[1])} (${(x[1]/t*100).toFixed(1)}%)</span>`).join('')}</div></div>`;
+}
+$('types').innerHTML=prop('ในเวลา / นอกเวลาราชการ',[['ในเวลา',2305,'var(--c-sur)'],['นอกเวลา',1519,'var(--c-eye)']])+
+ prop('ประเภทแผลผ่าตัด',[['ประเภทที่ 1 Clean',1303,'var(--w1)'],['ประเภทที่ 2 Clean contaminated',1770,'var(--w2)'],['ประเภทที่ 3 Contaminated',602,'var(--w3)'],['ประเภทที่ 4 Dirty',149,'var(--w4)']]);
+/* ===== risk view (from risk register) ===== */
+(function(){
+const sv=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const S2=a=>a.reduce((x,y)=>x+y,0);
+const med=a=>{const s=[...a].sort((x,y)=>x-y);return (s[5]+s[6])/2;};
+const BR={S:'sur',O:'ort',G:'ob',E:'ent',Y:'eye',P:'ped',M:'max'};
+const dname=id=>DEPTS.find(d=>d.id===id);
+const brName=b=>b==='-'?'ไม่ระบุสาขา':dname(BR[b]).name;
+const brCol=b=>b==='-'?'var(--muted)':`var(--c-${BR[b]})`;
+const WN={1:'Clean',2:'Clean contaminated',3:'Contaminated',4:'Dirty'};
+const rows=RISK.map(a=>({m:a[0],d:a[1],b:a[2],c:a[3],t:a[4],k:a[5].split(','),x:a[6]}));
+const N=rows.length,GTc=MT.reduce((x,y)=>x+y,0);
+const per=(n,d)=>d?(n/d*100):0;
+const f1=v=>v.toFixed(1);
+const cnt=m=>rows.filter(r=>r.m===m).length;
+const mon=MONTHS.map((_,i)=>cnt(i));
+const rate=mon.map((n,i)=>per(n,MT[i]));
+const flagOf=(arr,minv)=>{const md=med(arr);return arr.map(v=>v>=1.5*md&&v>=(minv||0));};
+const flMon=flagOf(mon,5);
+const peak=mon.indexOf(Math.max(...mon));
+const catN=Object.fromEntries(RISK_CATS.map(([k])=>[k,MONTHS.map((_,i)=>rows.filter(r=>r.m===i&&r.k.includes(k)).length)]));
+const catT=k=>S2(catN[k]);
+const catName=Object.fromEntries(RISK_CATS);
+const has=(re)=>rows.filter(r=>re.test(r.x.toLowerCase())).length;
+
+sv('rsub').textContent='สรุปจากทะเบียนรายงานความเสี่ยง '+fmt(N)+' รายการ ไม่แสดงชื่อ HN ของผู้ป่วย หรือชื่อบุคลากร';
+
+/* highlights */
+const nLan=has(/lan|แลน/),nCons=has(/ยินยอม|ใบเซ็น|ใบเซนต์/),nAsm=has(/ใบเตรียม|ใบประเมิน|แบบประเมิน|แบบบันทึก/);
+const nWrongP=has(/ผิดคน|ผิดเตียง|ผิด chart/),nSide=has(/ข้างที่(จะ)?ผ่าตัด|ติดป้ายเป็นข้าง|ผ่าตัดข้างซ้าย|ระบุ ข้าง/);
+const nLoss=has(/loss|polyp loss/);
+const bs=['S','O','G'].map(b=>({b,n:rows.filter(r=>r.b===b).length,r:per(rows.filter(r=>r.b===b).length,dname(BR[b]).t)})).sort((a,b)=>b.r-a.r);
+const aft=rows.filter(r=>r.t==='N').length,inn=rows.filter(r=>r.t==='I').length;
+const flNames=MFULL.filter((_,i)=>flMon[i]);
+const sumLi=[
+ `ทั้งปีมีรายงานความเสี่ยง <b>${fmt(N)} รายการ</b> หรือ <b>${f1(per(N,GTc))} ต่อ 100 ผ่าตัด</b> เดือนที่มากที่สุดคือ <b>${MFULL[peak]}</b> (${mon[peak]} รายการ, ${f1(rate[peak])} ต่อ 100 ผ่าตัด)${flNames.length?' เดือนที่สูงผิดปกติ: '+flNames.join(', '):''}`,
+ `ปัญหาเรื่อง <b>เอกสาร/ขั้นตอนก่อนผ่าตัด</b> พบมากที่สุด ${fmt(catT('doc'))} รายการ (${f1(per(catT('doc'),N))}%) ได้แก่ ไม่ส่ง LAN ${nLan} · ไม่มีใบเซ็นยินยอม ${nCons} · ไม่มีใบเตรียม/ประเมินก่อนผ่าตัด ${nAsm}`,
+ `<b>ความปลอดภัยของผู้ป่วยโดยตรง:</b> เหตุการณ์ทางคลินิก ${catT('clin')} รายการ (เช่น เสียเลือดมาก, tear, ย้าย ICU ไม่ได้วางแผน, specimen/polyp หาย ${nLoss}) · ระบุตัวผู้ป่วย/ข้างผ่าตัด ${catT('id')} รายการ (ผู้ป่วยหรือเอกสารผิดคน ${nWrongP}, ป้ายข้อมืออยู่ข้างที่จะผ่าตัด/ผิดข้าง ${nSide})`,
+ `เครื่องมือ/เซต/ผ้า ไม่ครบหรือไม่พร้อมใช้ ${catT('inst')} รายการ · ความปราศจากเชื้อ/ความสะอาด ${catT('ster')} รายการ · ผ่าตัดถูกเลื่อนหรือ off case ${catT('post')} รายการ`,
+ `ในสามสาขาใหญ่ อัตราสูงสุดคือ <b>${brName(bs[0].b)}</b> ${f1(bs[0].r)} ต่อ 100 ผ่าตัด (${bs[0].n} รายการ) ผู้ที่ระบุเวลา: นอกเวลา ${aft} รายการ จาก ${aft+inn} (${f1(per(aft,aft+inn))}%) เทียบกับสัดส่วนผ่าตัดนอกเวลาทั้งหมด ${f1(per(1519,3824))}%`
+];
+sv('sum').innerHTML=sumLi.map(s=>`<li>${s}</li>`).join('');
+
+/* scorecards */
+function spark(vals,fl,tip){
+ const mx=Math.max(...vals,1e-9),W=240,H=34,bw=W/12;
+ return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">`+vals.map((v,i)=>{const h=Math.max(v/mx*(H-2),v>0?2:0);return `<rect x="${i*bw+2}" y="${H-h}" width="${bw-4}" height="${h}" rx="1.5" style="fill:${fl&&fl[i]?'var(--w4)':'var(--muted)'};opacity:${fl&&fl[i]?1:.45}"><title>${MFULL[i]} ${tip?tip(v):v}</title></rect>`;}).join('')+'</svg>';
+}
+const catCard=(k,t,cls)=>{const fl=flagOf(catN[k],5);const nf=fl.filter(Boolean).length;
+ return {t,v:fmt(catT(k)),s:`${f1(per(catT(k),N))}% ของรายงานทั้งหมด`,cls,sp:spark(catN[k],fl),c:nf?`<span class="chip warn">สูงผิดปกติ ${nf} เดือน</span>`:'<span class="chip">ไม่พบเดือนที่สูงผิดปกติ</span>'};};
+const cards=[
+ {t:'รายงานความเสี่ยงทั้งปี',v:fmt(N),s:`${f1(per(N,GTc))} ต่อ 100 ผ่าตัด · เฉลี่ย ${f1(N/12)} รายการ/เดือน`,cls:'',sp:spark(mon,flMon),c:flNames.length?`<span class="chip hi">สูงผิดปกติ ${flNames.length} เดือน</span>`:'<span class="chip">ไม่พบเดือนที่สูงผิดปกติ</span>'},
+ catCard('clin','เหตุการณ์ทางคลินิก','sc-hi'),
+ catCard('id','ระบุตัวผู้ป่วย/ข้างผ่าตัด','sc-hi'),
+ catCard('staff','บุคลากรได้รับอันตราย','sc-warn'),
+ catCard('post','เลื่อน/ยกเลิก (Off case)','sc-warn'),
+ catCard('doc','เอกสาร/LAN/ใบยินยอม',''),
+ catCard('inst','เครื่องมือ/เซต/ผ้า',''),
+ catCard('ster','ความปราศจากเชื้อ/สะอาด','')
+];
+sv('score').innerHTML=cards.map(c=>`<div class="sc ${c.cls}"><div class="sc-t">${c.t}</div><div class="sc-v">${c.v}</div><div class="sc-s">${c.s}</div>${c.sp}${c.c}</div>`).join('');
+
+/* stacked monthly chart by branch */
+const grp=b=>['S','O','G'].includes(b)?b:'x';
+const brS=[{n:'ศัลยกรรมทั่วไป',c:'var(--c-sur)',k:'S'},{n:'ออร์โธปิดิกส์',c:'var(--c-ort)',k:'O'},{n:'สูติ-นรีเวช',c:'var(--c-ob)',k:'G'},{n:'สาขาอื่น / ไม่ระบุ',c:'var(--c-max)',k:'x'}]
+ .map(s=>({...s,v:MONTHS.map((_,i)=>rows.filter(r=>r.m===i&&grp(r.b)===s.k).length)}));
+sv('lg-mon').innerHTML=brS.map(s=>`<span><i class="sw" style="background:${s.c}"></i>${s.n}</span>`).join('');
+(function(){
+ const W=720,H=270,L=40,Rr=8,T=26,B=28,step=10;
+ const maxV=Math.ceil(Math.max(...mon)/step)*step,y=v=>T+(H-T-B)*(1-v/maxV),bw=(W-L-Rr)/12;let s='';
+ flMon.forEach((f,i)=>{if(f)s+=`<rect x="${L+i*bw}" y="${T-14}" width="${bw}" height="${H-T-B+14}" style="fill:var(--w4);opacity:.11"/>`;});
+ for(let v=0;v<=maxV;v+=step)s+=`<line x1="${L}" x2="${W-Rr}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+ MONTHS.forEach((m,i)=>{const x=L+i*bw+bw*.16,w=bw*.68;let acc=0;
+  brS.forEach(se=>{const v=se.v[i];if(!v)return;const y1=y(acc+v),y0=y(acc);acc+=v;s+=`<rect x="${x}" y="${y1}" width="${w}" height="${Math.max(y0-y1,0)}" style="fill:${se.c}"><title>${MFULL[i]} · ${se.n} ${v}</title></rect>`;});
+  const hot=flMon[i];
+  s+=`<text class="val" x="${x+w/2}" y="${y(acc)-5}" text-anchor="middle" ${hot?'style="fill:var(--w4)"':''}>${acc}</text><text x="${x+w/2}" y="${H-9}" text-anchor="middle" ${hot?'style="fill:var(--w4);font-weight:600"':''}>${m}</text>`;});
+ sv('ch-mon').setAttribute('viewBox',`0 0 ${W} ${H}`);sv('ch-mon').innerHTML=s;
+})();
+
+/* matrix */
+const mxMax=Math.max(...RISK_CATS.map(([k])=>Math.max(...catN[k])));
+const cell=(v,hot,mx)=>hot?`<td class="mx-hi">${v}</td>`:v===0?'<td class="zero">–</td>':`<td style="background:color-mix(in srgb,var(--w3) ${Math.round(v/mx*40)}%,transparent)">${v}</td>`;
+const order=RISK_CATS.map(([k])=>k).filter(k=>k!=='oth').sort((a,b)=>catT(b)-catT(a)).concat(['oth']);
+const flR=flagOf(rate,0);
+sv('mx').innerHTML=`<thead><tr><th>ประเภทความเสี่ยง</th>${MONTHS.map(m=>`<th>${m}</th>`).join('')}<th>รวม</th><th>%</th></tr></thead><tbody>`+
+ `<tr><td><b>รายงานทั้งหมด (รายการ)</b></td>${mon.map((v,i)=>cell(v,flMon[i],mxMax*1.6)).join('')}<td class="tot">${fmt(N)}</td><td class="tot">100</td></tr>`+
+ `<tr><td>ต่อ 100 ผ่าตัด</td>${rate.map((v,i)=>flR[i]?`<td class="mx-hi">${f1(v)}</td>`:`<td>${f1(v)}</td>`).join('')}<td class="tot">${f1(per(N,GTc))}</td><td></td></tr>`+
+ order.map(k=>{const fl=flagOf(catN[k],5);return `<tr><td>${esc(catName[k])}</td>${catN[k].map((v,i)=>cell(v,fl[i],mxMax)).join('')}<td class="tot">${catT(k)}</td><td>${f1(per(catT(k),N))}</td></tr>`;}).join('')+
+ `</tbody><tfoot><tr><td>ประเภทที่สูงผิดปกติ (ข้อ)</td>${MONTHS.map((_,i)=>{const n=order.filter(k=>flagOf(catN[k],5)[i]).length;return `<td class="${n>=2?'mx-hi':''}">${n||'–'}</td>`;}).join('')}<td></td><td></td></tr></tfoot>`;
+
+/* branch */
+const brs=['S','O','G','E','Y','P','M','-'].map(b=>{const n=rows.filter(r=>r.b===b).length;const dp=b==='-'?null:dname(BR[b]);return {b,n,cases:dp?dp.t:null,r:dp?per(n,dp.t):null};}).filter(x=>x.n>0);
+const bmax=Math.max(...brs.map(x=>x.n)),rmax=Math.max(...brs.filter(x=>x.r!=null&&x.cases>=100).map(x=>x.r));
+sv('br').innerHTML=brs.map(x=>`<div class="deptrow"><div class="dn"><i class="sw" style="background:${brCol(x.b)}"></i>${esc(brName(x.b))}</div><div class="dbar"><div class="track"><i style="width:${x.n/bmax*100}%;background:${brCol(x.b)}"></i></div><div class="dnum">${x.n} <small>${x.r==null?'':'· '+f1(x.r)+' ต่อ 100'}</small></div></div></div>`).join('')+
+ `<p class="note">สาขาที่มีผ่าตัดน้อยกว่า 100 รายทั้งปี (ENT, กุมารเวชกรรม, Maxillofacial) อัตราคำนวณจากฐานเล็ก ใช้เทียบกับสาขาอื่นไม่ได้</p>`;
+
+/* segments */
+const wcCases={1:1303,2:1770,3:602,4:149};
+const segRow=(l,n,c,hot)=>`<tr><td>${l}</td><td>${n}</td><td>${fmt(c)}</td><td class="${hot?'mx-hi':''}">${f1(per(n,c))}</td></tr>`;
+const wr=[1,2,3,4].map(c=>per(rows.filter(r=>r.c===c).length,wcCases[c]));
+const wmax=Math.max(...wr);
+const inN=rows.filter(r=>r.t==='I').length,afN=rows.filter(r=>r.t==='N').length;
+sv('seg').innerHTML=`<thead><tr><th></th><th>รายการ</th><th>ผ่าตัด (ราย)</th><th>ต่อ 100</th></tr></thead><tbody>`+
+ [1,2,3,4].map((c,i)=>segRow(`ประเภทที่ ${c} ${WN[c]}`,rows.filter(r=>r.c===c).length,wcCases[c],wr[i]===wmax)).join('')+
+ segRow('ในเวลาราชการ',inN,2305,false)+segRow('นอกเวลาราชการ',afN,1519,per(afN,1519)>per(inN,2305)*1.1)+
+ `<tr><td>ไม่ระบุประเภทแผล/เวลา (เช่น เลื่อนผ่าตัด)</td><td>${rows.filter(r=>r.c===0).length} / ${rows.filter(r=>r.t==='-').length}</td><td></td><td></td></tr></tbody>`;
+
+/* list */
+const catChip=k=>`<span class="chip ${k==='clin'||k==='staff'?'hi':k==='id'||k==='med'?'warn':''}">${esc(catName[k])}</span>`;
+const yr=m=>m<3?68:69;
+const fm=sv('f-m'),fb=sv('f-b'),fc=sv('f-c'),fq=sv('f-q'),rl=sv('rl'),more=sv('more');
+fm.innerHTML='<option value="">ทุกเดือน</option>'+MFULL.map((m,i)=>`<option value="${i}">${m} ${yr(i)+2500}</option>`).join('');
+fb.innerHTML='<option value="">ทุกสาขา</option>'+brs.map(x=>`<option value="${x.b}">${esc(brName(x.b))}</option>`).join('');
+fc.innerHTML='<option value="">ทุกประเภท</option>'+order.map(k=>`<option value="${k}">${esc(catName[k])}</option>`).join('');
+let shown=40,list=[];
+function render(){
+ const q=fq.value.trim().toLowerCase();
+ list=rows.filter(r=>(fm.value===''||r.m===+fm.value)&&(!fb.value||r.b===fb.value)&&(!fc.value||r.k.includes(fc.value))&&(!q||r.x.toLowerCase().includes(q)));
+ list=list.map((r,i)=>[r,i]).sort((a,b)=>(b[0].m-a[0].m)||(b[0].d-a[0].d)||(b[1]-a[1])).map(a=>a[0]);
+ sv('ls-note').textContent='พบ '+fmt(list.length)+' จาก '+fmt(N)+' รายการ · เรียงจากล่าสุด';
+ rl.innerHTML=list.slice(0,shown).map(r=>`<div class="ri"><div class="rh"><b>${r.d} ${MONTHS[r.m]} ${yr(r.m)}</b><span class="chip"><i class="sw" style="background:${brCol(r.b)};margin-right:5px"></i>${esc(brName(r.b))}</span>${r.c?`<span class="chip">ประเภทที่ ${r.c} ${WN[r.c]}</span>`:''}${r.t==='N'?'<span class="chip">นอกเวลา</span>':r.t==='I'?'<span class="chip">ในเวลา</span>':''}${r.k.map(catChip).join('')}</div><div class="rt">${esc(r.x)}</div></div>`).join('')||'<p class="note">ไม่พบรายการตามเงื่อนไข</p>';
+ more.hidden=list.length<=shown;more.textContent='แสดงเพิ่ม ('+(list.length-shown)+' รายการที่เหลือ)';
+}
+[fm,fb,fc].forEach(e=>e.addEventListener('change',()=>{shown=40;render();}));
+fq.addEventListener('input',()=>{shown=40;render();});
+more.addEventListener('click',()=>{shown+=60;render();});
+render();
+
+/* view switch */
+const vs={ops:sv('view-ops'),risk:sv('view-risk')};
+function show(k){vs.ops.hidden=k!=='ops';vs.risk.hidden=k!=='risk';document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===k));try{history.replaceState(null,'',k==='risk'?'#risk':location.pathname+location.search);}catch(e){}}
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
+if(location.hash==='#risk')show('risk');
+})();
+</script>
+
+</body></html>
